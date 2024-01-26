@@ -2,7 +2,7 @@
     /**
      * This script could have contained a class....
      * For the purpose of showing multiple ways to achieve a goal,
-     * this does not contain a class...
+     * this file does not contain a class...
      * 
      * @author: w.delamare
      * @date: Dec. 2023
@@ -18,7 +18,7 @@
      * 
      */
 
-    //  Check if the user comes from the form...
+    // Check if the user comes from the form...
     // Otherwise, trying to cheat the system!
     if (isset($_POST['login']) && isset($_POST['pwd'])) {
 

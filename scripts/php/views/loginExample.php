@@ -23,6 +23,7 @@
         }
         elseif (strcmp($_GET['error'], "notallowed") == 0) {
             $something_to_say = "You should login first.";
+            // In a real website, we would also redirect to the page the user was trying to access once logged in
         }
     }
 
