@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Our model classes (userModel in this example) extends the base class DBModel
+ * Our model classes (UserModel in this example) extends the base class DBModel
  * so that we can factorize every common methods into the super class
  * 
  * Every other model classes (to deal with other data and tables) will follow the same principle
@@ -12,7 +12,7 @@
 
 require_once("DBModel.php");
 
-class userModel extends DBModel {
+class UserModel extends DBModel {
 
 
     /**
@@ -41,7 +41,13 @@ class userModel extends DBModel {
         }
         return $result;
     }
+
+    // other useful methods to interact with the database
+    // could be to add a new user, to delete a user, to update a user, etc.
+    // all these methods will be called by the controller
+    // and will be used to display the correct view
+    // (e.g., if the user is added, the controller will call the view to display the welcome page)
+    // (e.g., if the user is not added, the controller will call the view to display the login form with an error message)
+    
 }
 
-
-?>

@@ -10,23 +10,8 @@
 <?php
     // do all necessary includes first
     // __DIR__ allows you to use relative paths explicitly
-    require_once(__DIR__."/scripts/php/views/includes.php");
-
-    // check if the form has been submitted and has been returned with an error
-    if (isset($_GET['error'])) {
-        // Let the controller perform all the checks (logic checks, e.g., empty, valid login/password pair)
-        if (strcmp($_GET['error'], "missing") == 0) {
-            $something_to_say = "Missing login and/or password";
-        }
-        elseif (strcmp($_GET['error'], "invalid") == 0) {
-            $something_to_say = "Invalid login and/or password.";
-        }
-        elseif (strcmp($_GET['error'], "notallowed") == 0) {
-            $something_to_say = "You should login first.";
-            // In a real website, we would also redirect to the page the user was trying to access once logged in
-        }
-    }
-
+    // here, the file is in the same folder as the includes.php file (view/)
+    
 ?>
 
 <!DOCTYPE html>
@@ -39,6 +24,7 @@
     </head>
     <body>
         
+        <!-- PHP only used to display stuff -->
         <?php include_header(); ?>
 
         <?php 
@@ -48,7 +34,7 @@
             }
         ?>
 
-        <form method="post" action="./scripts/php/controllers/loginController.php">
+        <form method="post" action="index.php">
             <fieldset>
                 <legend>Login</legend>
                 <input type="text" placeholder="login" id="login" name="login">
