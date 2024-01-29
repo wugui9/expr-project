@@ -49,4 +49,9 @@ Try to login with the following credentials:
 1. For the **view**, the project provides an example of an include file to prevent you from re-writing the same code over and over again. You can find the include file in the `view` folder.
 1. The code is **commented** to help you understand how it works. 
 
->       Your project should follow the same architecture, as well as the same coding style (indentation, comments, etc.).
+> Your project should follow the same architecture, as well as the same coding style (indentation, comments, etc.).
+
+
+# MVC Architecture
+
+
