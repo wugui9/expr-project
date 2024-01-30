@@ -69,9 +69,10 @@ The controller is the flow of the application. It is the part of the application
 
 
 <figure style="text-align:center">
-    <img src="figs/mvc.png" width="600">
+    <img src="figs/MVC.png?raw=true" width="600">
     <figcaption>Figure 1: MVC Architecture</figcaption>
 </figure>
+
 
 1. The user interacts with the view (e.g. clicks on a button)
 1. The view sends the user input to the controller
