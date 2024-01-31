@@ -11,7 +11,7 @@
     // do all necessary includes first
     // __DIR__ allows you to use relative paths explicitly
     // here, the file is in the same folder as the includes.php file (view/)
-    
+    include_once __DIR__ . '/includes.php';
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +19,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="styles/example.css">
+        <link rel="stylesheet" href="view/css/example.css">
         <title>Login Example</title>
     </head>
     <body>
@@ -34,7 +34,7 @@
             }
         ?>
 
-        <form method="post" action="index.php">
+        <form method="post" action="loginController.php">
             <fieldset>
                 <legend>Login</legend>
                 <input type="text" placeholder="login" id="login" name="login">

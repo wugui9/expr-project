@@ -7,13 +7,20 @@
 * @date: Dec. 2023
  -->
 
+ <?php
+    // do all necessary includes first
+    // __DIR__ allows you to use relative paths explicitly
+    // here, the file is in the same folder as the includes.php file (view/)
+    include_once __DIR__ . '/includes.php';
+?>
+
 
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="styles/example.css">
+        <link rel="stylesheet" href="view/css/example.css">
         <title>Welcome</title>
     </head>
     <body>
@@ -30,7 +37,7 @@
             <!-- A form to logout -->
             <!-- It redirects to the form controller -->
             <!-- Note that this could have been done with a simple link and a $_GET parameter -->
-            <form method="post" action="index.php">
+            <form method="post" action="loginController.php">
                 <fieldset>
                     <legend>Logout</legend>
                     <button type="submit">Logout</button>

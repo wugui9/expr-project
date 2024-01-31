@@ -1,8 +1,10 @@
 <?php
     /**
-     * Example of a simple controller
-     * It will call the model to get the data
-     * and then decide which view to display (login form or welcome page)
+     * Example of a simple test controller
+     * to test the model ONLY!!
+     * #########################################################
+     * #### Real controllers are at the root of the project ####
+     * #########################################################
      * 
      * @author: p.reuter
      * @date: Dec. 2023
@@ -11,7 +13,8 @@
     
     // do all necessary includes first
     // __DIR__ allows you to use relative paths explicitly
-    require_once(__DIR__."/scripts/php/models/UserModel.php");
+    // for this test controller (i.e. a controller that is not calling the view, just to test the model)
+    require_once(__DIR__."/../model/UserModel.php");
 
     $userModel = new UserModel();
 
