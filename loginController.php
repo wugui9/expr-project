@@ -32,6 +32,7 @@
                 session_start();
                 $_SESSION['firstname'] = $result['firstname'];
                 $_SESSION['lastname'] = $result['lastname'];
+                $_SESSION['id'] = $result['id'];
             }
             else {
                 // set the error message to be displayed in the view
@@ -55,8 +56,6 @@
     // Now, let's call the view.
     // If something to say, the view will display it
     // Otherwise, the view will simply display the login form
-
-    // and then call the correct view
     // the form if not logged in, the welcome page if logged in
     if (isset($_SESSION['firstname'])) {
         require_once(__DIR__."/view/php/welcomePage.php");

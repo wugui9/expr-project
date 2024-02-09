@@ -38,6 +38,7 @@ class UserModel extends DBModel {
         if (count($entries) == 1) {
             $result["firstname"] = $entries[0]['firstname'];
             $result["lastname"] = $entries[0]['lastname'];
+            $result["id"] = $entries[0]['id'];
         }
         return $result;
     }
