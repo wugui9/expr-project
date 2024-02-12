@@ -31,7 +31,7 @@ class DBModel {
      * @return: true if the connection was successful, false otherwise
      */
     private function connect_to_db() {   
-        require_once __DIR__. "/env_settings.php";     
+        require __DIR__. "/env_settings.php";     
         try {
             $this->db = new PDO('mysql:host='.$host.';dbname='.$dbname.';charset=utf8', $user, $pwd, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
             return true;
