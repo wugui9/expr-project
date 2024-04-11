@@ -19,7 +19,11 @@ By following the MVC architecture, the project is divided into three main folder
 * Click on `Start the creation of the Virtual Host`
 * Right-click on the WAMP icon, select `Tools` and click on `Restart DNS`
 
-![](figs/dns.png) "DNS location"
+<figure style="text-align:center">
+    <img src="figs/dns.png?raw=true" width="600">
+    <figcaption>Figure 1: 'Restart DNS' location</figcaption>
+</figure>
+
 
 ### Project
 
@@ -34,7 +38,8 @@ By following the MVC architecture, the project is divided into three main folder
 
 
 You can now visit the project at `tai` (or the name you set as `Virtual Host Name` in the Virtual Host creation)
-Try to login with the following credentials:
+Try to log in with the following credentials:
+
 |First Name|Last name|Login|Password|
 |:----------:|:---------:|:-----:|:--------:|
 |Homer|Simpson|donut|123|
@@ -70,7 +75,7 @@ The controller is the flow of the application. It is the part of the application
 
 <figure style="text-align:center">
     <img src="figs/MVC.png?raw=true" width="600">
-    <figcaption>Figure 1: MVC Architecture</figcaption>
+    <figcaption>Figure 2: MVC Architecture</figcaption>
 </figure>
 
 
