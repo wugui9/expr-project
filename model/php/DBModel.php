@@ -37,7 +37,8 @@ class DBModel {
             return true;
         }
         catch (Exception $e) {
-            return false;
+            // return false;
+            die("Connection to the database failed: " . $e->getMessage());
         }
     }
 
