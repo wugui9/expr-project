@@ -10,17 +10,23 @@
  * @date: Dec. 2023
  */
 
-require_once("DBModel.php");
 
-class UserModel extends DBModel {
+class UserModel {
 
+
+    private $db; // connection object (or $conn)
+
+    // initialize the database connection in the constructor
+    public function __construct($connection) {
+        $this->db = $connection;
+    }
 
     /**
      * @return an associative array of all employees with first_name, last_name, id, creation_date (not formatted)
      */
     function check_login(string $login, string $password) {
         $result = [];
-        if (!$this->connected) {
+        if ($this->db == null) {
             // Something went wrong during the connection to the database.
             // In this example, we simply do not perform the query...
             // A real website should display a message for users to understand while they cannot log in

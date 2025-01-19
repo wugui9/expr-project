@@ -7,6 +7,11 @@
  * @date: Dec. 2023
  */
 
+class GlobalView {
+
+    
+
+
     function include_header() {
         ?>
         <header>
@@ -18,6 +23,8 @@
 
 
     function include_footer() {
+        // This method is used to display the footer of the website
+        // It is the same for all pages, so one change here will be reflected on all pages
         ?>
         <footer>
             Copyright!©️TAI <a href="mailto:">Contact</a>
@@ -27,8 +34,10 @@
 
 
     function include_error_message($message) {
+        // This method is used to display an error message via the class defined in the CSS file
         echo "<p class='error_message'>" . $message . "</p>";
     }
 
+}
 
 ?>

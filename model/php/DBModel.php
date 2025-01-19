@@ -8,38 +8,30 @@
  * @created Dec. 2023
  */
 class DBModel {
+    
+    public $conn; // connection object
 
-    // let's hide ou connection from others
-    protected $db = null;
-    protected $connected = false;
-
-
-    /**
-     * Constructor
-     * takes care of connecting to the database
-     */
-
-     public function __construct() {
-        $this->connected = $this->connect_to_db();
-     }
-
-
-    /**
-     * Will try to connect to the pre-defined db
-     * Private since the constructor will manage the connection
-     *
-     * @return: true if the connection was successful, false otherwise
-     */
-    private function connect_to_db() {   
-        require __DIR__. "/env_settings.php";     
+    // initialize the database connection in the constructor
+    public function __construct() {
+        // include the settings file
+        require __DIR__ . '/env_settings.php';
         try {
-            $this->db = new PDO('mysql:host='.$host.';dbname='.$dbname.';charset=utf8', $user, $pwd, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-            return true;
+            $this->conn = new PDO("mysql:host=" . $host . ";dbname=" . $dbname, $user, $pwd);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch(PDOException $exception) {
+            echo "Connection error: " . $exception->getMessage();
+            // if we are here, $this->conn is null
+            // to simplify the code for the next examples, we will stop the execution here
+            die();
         }
-        catch (Exception $e) {
-            // return false;
-            die("Connection to the database failed: " . $e->getMessage());
-        }
+    }
+
+    public function get_connection() {
+        return $this->conn;
+    }
+
+    public function close_connection() {
+        $this->conn = null;
     }
 
 

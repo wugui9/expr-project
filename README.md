@@ -111,13 +111,19 @@ This is the endpoint of the application (e.g., https://devweb.estia.fr/project/t
 <?php
     // Include the model (the data) from the model folder
     include_once('scripts/php/models/the_model.php');
-    
-    // Get the list of users
-    // after that line, the variable $users will contain the list of users
-    $users = get_users();
-    
     // Include the view (the display) from the view folder
     include_once('scripts/php/views/the_view.php');
+    
+    $model = new TheModel();
+    $view = new TheView();
+
+    // Get the list of users
+    // after that line, the variable $users will contain the list of users
+    $users = $model->get_users();
+
+    // and the view takes care of displaying the data
+    $view->display($users);
+    
 ?>
 ```
 
@@ -125,7 +131,15 @@ This is the endpoint of the application (e.g., https://devweb.estia.fr/project/t
 This is the display of the application. It is the file that will display the data to the user. It should include as little logic (PHP) as possible.
 
 ```php
-<html>
+<?php
+class TheView {
+
+    // Function that displays the list of users
+    public function display($users) {
+        // all of this could have been separated in another include file
+        // but for the sake of the example, it is all in the same file, and in the same function!
+?>
+    <html>
     <head>
         <title>My Application</title>
     </head>
@@ -155,6 +169,12 @@ This is the display of the application. It is the file that will display the dat
             </tbody>
         </table>
     </body>
+    </html>
+<?php
+    // do not forget to close the function with }
+    }
+}
+
 ```
 
 
@@ -163,17 +183,20 @@ This is the data of the application. It is the file that will interact with the 
 
 ```php
 <?php
-    // Function that returns the list of users
-    function get_users() {
-        // Connect to the database
-        $db = ...;
-        
-        $query = $db->prepare('SELECT * FROM users');
-        $query->execute();
-        $users = $query->fetchAll();
+    
+    class TheModel {
+        // Function that returns the list of users
+        function get_users() {
+            // Connect to the database
+            $db = ...;
+            
+            $query = $db->prepare('SELECT * FROM users');
+            $query->execute();
+            $users = $query->fetchAll();
 
-        // Return the results
-        return $users;
+            // Return the results
+            return $users;
+        }
     }
 ?>
 ```
