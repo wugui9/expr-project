@@ -1,13 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HelloWorld from '../components/HelloWorld.vue';
-import Login from '../components/Login.vue'; // Import the Login component
+import Login from '../components/Login.vue';
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: HelloWorld,
-  },
   {
     path: '/login',
     name: 'Login',
@@ -20,4 +14,4 @@ const router = createRouter({
   routes,
 });
 
-export default router; // Ensure the router is exported as default
+export default router;

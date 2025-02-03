@@ -1,6 +1,6 @@
 <template>
-  <div class="login">
-    <el-card class="box-card">
+  <div>
+    <el-card>
       <h1>Login</h1>
       <el-form @submit.prevent="login">
         <el-form-item>
@@ -30,9 +30,4 @@ const login = () => {
 </script>
 
 <style scoped>
-.login {
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 1rem;
-}
 </style>
