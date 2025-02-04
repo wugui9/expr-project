@@ -1,14 +1,12 @@
-CREATE TABLE IF NOT EXISTS storage (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    city VARCHAR(255) NOT NULL,
-    postal_code VARCHAR(20) NOT NULL,
-    detailed_address TEXT NOT NULL,
-    latitude DECIMAL(10, 8) NOT NULL DEFAULT 0,
-    longitude DECIMAL(11, 8) NOT NULL DEFAULT 0,
-    capacity_volume_of_the_warehouse INT NOT NULL COMMENT 'Storage capacity in cubic meters',
-    capacity_weight_of_the_warehouse INT NOT NULL COMMENT 'Weight capacity in kilograms',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS `storage` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
+    `address` TEXT NOT NULL,
+    `phone` VARCHAR(15) NOT NULL,
+    `email` VARCHAR(100) NOT NULL,
+    `capacity` INT NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Add some sample data
