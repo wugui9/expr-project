@@ -1,23 +1,27 @@
 <?php
 require_once __DIR__ . '/../model/php/env_settings.php';
 require_once __DIR__ . '/ApiRouter.php';
+require_once __DIR__ . '/../schemas/hello_schema.php';
 
 // Hello请求处理函数
 function handleHello($data) {
-    // 业务层校验
-    if (!isset($data['msg']) || !is_string($data['msg'])) {
+    $request = HelloRequest::fromArray($data);
+    if (!$request->validate()) {
         throw new Exception('Invalid msg parameter');
     }
     
-    return [
-        'msg' => 'hello ' . $data['msg']
-    ];
+    $response = HelloResponse::create('hello ' . $request->msg);
+    return $response->toArray();
 }
 
 function handleGetHello($data) {
-    return [
-        'msg' => 'hello ' . $data['msg']
-    ];
+    $request = HelloRequest::fromArray($data);
+    if (!$request->validate()) {
+        throw new Exception('Invalid msg parameter');
+    }
+    
+    $response = HelloResponse::create('hello ' . $request->msg);
+    return $response->toArray();
 }
 
 $router = new ApiRouter();
