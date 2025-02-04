@@ -1,47 +1,48 @@
 <template>
-  <div class="storage-container p-6">
-    <h2 class="text-2xl font-bold mb-4">Pickup Points Management</h2>
-    
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <div class="map-container h-[500px] bg-gray-100 rounded-lg relative">
-        <div id="map" class="w-full h-full rounded-lg"></div>
-        <div v-if="!isMapLoaded" class="absolute inset-0 flex items-center justify-center bg-gray-100">
-          <el-icon class="text-4xl animate-spin"><Loading /></el-icon>
+  <div class="storage-page">
+    <div class="storage-container">
+      <h2 class="text-2xl font-bold mb-4">Point relais</h2>
+      
+      <div class="search-container mb-6">
+        <div class="flex gap-4 items-center">
+          <div class="flex-1">
+            <label class="block mb-1">City</label>
+            <el-input
+              v-model="searchCity"
+              placeholder="Enter city name"
+              @input="debouncedSearch"
+            />
+          </div>
+          <div class="flex-1">
+            <label class="block mb-1">Postal Code</label>
+            <el-input
+              v-model="searchPostalCode"
+              placeholder="Enter postal code"
+              @input="debouncedSearch"
+            />
+          </div>
         </div>
       </div>
 
-      <el-table
-        v-loading="loading"
-        :data="storageList"
-        border
-        style="width: 100%"
-        height="500px"
-      >
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="city" label="City" />
-        <el-table-column prop="postal_code" label="Postal Code" width="120" />
-        <el-table-column prop="detailed_address" label="Address" />
-        <!-- <el-table-column prop="latitude" label="Latitude" width="120">
-          <template #default="scope">
-            {{ scope.row.latitude || 'N/A' }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="longitude" label="Longitude" width="120">
-          <template #default="scope">
-            {{ scope.row.longitude || 'N/A' }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="capacity_volume_of_the_warehouse" label="Volume" width="120">
-          <template #default="scope">
-            {{ scope.row.capacity_volume_of_the_warehouse }} m³
-          </template>
-        </el-table-column>
-        <el-table-column prop="capacity_weight_of_the_warehouse" label="Weight" width="120">
-          <template #default="scope">
-            {{ scope.row.capacity_weight_of_the_warehouse }} kg
-          </template>
-        </el-table-column> -->
-      </el-table>
+      <div v-if="loading" class="mb-4">
+        Loading data...
+      </div>
+      <div v-if="error" class="mb-4 text-red-500">
+        {{ error }}
+      </div>
+      <div v-if="filteredStorages.length === 0" class="mb-4">
+        No pickup points found for the current search
+      </div>
+      <div v-else class="mb-4">
+        Found {{ filteredStorages.length }} pickup points
+      </div>
+
+      <div class="map-wrapper relative bg-gray-100 rounded-lg overflow-hidden" style="height: 600px;">
+        <div id="map" class="absolute inset-0"></div>
+        <div v-if="!isMapLoaded" class="absolute inset-0 flex items-center justify-center bg-gray-100/80">
+          <el-icon class="text-4xl animate-spin"><Loading /></el-icon>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -59,33 +60,146 @@ export default {
   data() {
     return {
       storageList: [],
+      filteredStorages: [],
       loading: false,
+      error: null,
       map: null,
       markers: [],
       isMapScriptLoaded: false,
-      isMapLoaded: false
+      isMapLoaded: false,
+      searchCity: '',
+      searchPostalCode: '',
+      searchTimeout: null
+    }
+  },
+  watch: {
+    searchCity() {
+      this.debouncedSearch()
+    },
+    searchPostalCode() {
+      this.debouncedSearch()
     }
   },
   async created() {
     this.loading = true
+    this.error = null
     try {
+      console.log('Fetching storage data...')
       const response = await axios.get('/api/storage/list')
+      console.log('API Response:', response.data)
+      
       this.storageList = response.data.storages || []
+      this.filteredStorages = [...this.storageList]
       
       if (this.storageList.length === 0) {
-        ElMessage.warning('No pickup points found')
+        this.error = 'No pickup points available'
       }
 
       // Load map after data is loaded
       this.loadGoogleMapsScript()
     } catch (error) {
       console.error('Failed to fetch storage list:', error)
-      ElMessage.error('Failed to load pickup points')
+      this.error = `Failed to load pickup points: ${error.message}`
     } finally {
       this.loading = false
     }
   },
   methods: {
+    debouncedSearch() {
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout)
+      }
+      this.searchTimeout = setTimeout(() => {
+        this.handleSearch()
+      }, 300)
+    },
+
+    handleSearch() {
+      this.filteredStorages = this.storageList.filter(storage => {
+        const cityMatch = !this.searchCity || 
+          storage.city.toLowerCase().includes(this.searchCity.toLowerCase())
+        const postalMatch = !this.searchPostalCode || 
+          storage.postal_code.includes(this.searchPostalCode)
+        return cityMatch && postalMatch
+      })
+      
+      // Clear existing markers
+      this.markers.forEach(marker => marker.setMap(null))
+      this.markers = []
+      
+      // Add new markers
+      this.addMarkers()
+    },
+
+    addMarkers() {
+      if (!this.map) return
+
+      this.filteredStorages.forEach(storage => {
+        const lat = parseFloat(storage.latitude)
+        const lng = parseFloat(storage.longitude)
+        
+        if (!isNaN(lat) && !isNaN(lng)) {
+          const position = { lat, lng }
+          
+          const marker = new google.maps.Marker({
+            position,
+            map: this.map,
+            title: storage.detailed_address,
+            animation: google.maps.Animation.DROP,
+            label: {
+              text: `${storage.id}`,
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            },
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: '#4B5563',
+              fillOpacity: 1,
+              strokeColor: '#FFFFFF',
+              strokeWeight: 2
+            }
+          })
+
+          const infoWindow = new google.maps.InfoWindow({
+            content: `
+              <div class="p-4 max-w-xs">
+                <h3 class="font-bold text-lg mb-2">Point ${storage.id}</h3>
+                <p class="mb-1"><strong>Ville:</strong> ${storage.city}</p>
+                <p class="mb-1"><strong>Adresse:</strong> ${storage.detailed_address}</p>
+                <p class="mb-1"><strong>Code Postal:</strong> ${storage.postal_code}</p>
+                <p class="mb-1"><strong>Capacité Volume:</strong> ${storage.capacity_volume_of_the_warehouse} m³</p>
+                <p class="mb-1"><strong>Capacité Poids:</strong> ${storage.capacity_weight_of_the_warehouse} kg</p>
+              </div>
+            `
+          })
+
+          marker.addListener('click', () => {
+            // Close all other info windows first
+            this.markers.forEach(m => {
+              if (m.infoWindow) {
+                m.infoWindow.close()
+              }
+            })
+            infoWindow.open(this.map, marker)
+          })
+
+          marker.infoWindow = infoWindow // Store reference to info window
+          this.markers.push(marker)
+        }
+      })
+
+      if (this.markers.length > 0) {
+        const bounds = new google.maps.LatLngBounds()
+        this.markers.forEach(marker => bounds.extend(marker.getPosition()))
+        this.map.fitBounds(bounds)
+        
+        // Add some padding to the bounds
+        this.map.setZoom(this.map.getZoom() - 1)
+      }
+    },
+
     loadGoogleMapsScript() {
       console.log('Loading Google Maps script...')
       if (!window.google && !this.isMapScriptLoaded) {
@@ -108,6 +222,7 @@ export default {
         this.initMap()
       }
     },
+
     async initMap() {
       console.log('Initializing map with data:', this.storageList)
       
@@ -116,78 +231,40 @@ export default {
         console.error('Map container not found')
         return
       }
-      
-      console.log('Map container dimensions:', {
-        width: mapElement.clientWidth,
-        height: mapElement.clientHeight,
-        offsetWidth: mapElement.offsetWidth,
-        offsetHeight: mapElement.offsetHeight
-      })
 
       try {
-        // Initialize the map
-        this.map = new google.maps.Map(mapElement, {
+        // Force a reflow to ensure the map container has proper dimensions
+        mapElement.style.display = 'none'
+        mapElement.offsetHeight // force reflow
+        mapElement.style.display = ''
+
+        const mapOptions = {
           zoom: 6,
           center: { lat: 46.603354, lng: 1.888334 }, // Center of France
           mapTypeControl: true,
           streetViewControl: true,
-          fullscreenControl: true
+          fullscreenControl: true,
+          styles: [
+            {
+              featureType: 'poi',
+              elementType: 'labels',
+              stylers: [{ visibility: 'off' }]
+            }
+          ]
+        }
+
+        this.map = new google.maps.Map(mapElement, mapOptions)
+
+        // Wait for the map to be fully loaded
+        google.maps.event.addListenerOnce(this.map, 'idle', () => {
+          console.log('Map fully loaded')
+          this.addMarkers()
+          this.isMapLoaded = true
         })
 
-        // Add markers for each storage location
-        for (const storage of this.storageList) {
-          console.log('Processing storage:', storage)
-          const lat = parseFloat(storage.latitude)
-          const lng = parseFloat(storage.longitude)
-          
-          if (!isNaN(lat) && !isNaN(lng)) {
-            console.log('Creating marker at:', lat, lng)
-            
-            const position = { lat, lng }
-            
-            // Create the marker using regular Marker
-            const marker = new google.maps.Marker({
-              position,
-              map: this.map,
-              title: storage.detailed_address,
-              animation: google.maps.Animation.DROP
-            })
-
-            // Add info window
-            const infoWindow = new google.maps.InfoWindow({
-              content: `
-                <div class="p-2">
-                  <h3 class="font-bold">${storage.city}</h3>
-                  <p>${storage.detailed_address}</p>
-                  <p>Postal Code: ${storage.postal_code}</p>
-                  <p>Volume: ${storage.capacity_volume_of_the_warehouse} m³</p>
-                  <p>Weight: ${storage.capacity_weight_of_the_warehouse} kg</p>
-                </div>
-              `
-            })
-
-            // Add click listener
-            marker.addListener('click', () => {
-              infoWindow.open(this.map, marker)
-            })
-
-            this.markers.push(marker)
-          }
-        }
-
-        // Fit bounds to show all markers
-        if (this.markers.length > 0) {
-          const bounds = new google.maps.LatLngBounds()
-          this.markers.forEach(marker => bounds.extend(marker.getPosition()))
-          this.map.fitBounds(bounds)
-        } else {
-          console.log('No valid markers to display')
-        }
-
-        this.isMapLoaded = true
       } catch (error) {
         console.error('Error initializing map:', error)
-        ElMessage.error('Failed to initialize map')
+        this.error = `Failed to initialize map: ${error.message}`
       }
     }
   }
@@ -195,20 +272,37 @@ export default {
 </script>
 
 <style scoped>
+.storage-page {
+  width: 100%;
+  min-height: 100vh;
+}
+
 .storage-container {
-  max-width: 1400px;
+  width: 100%;
   margin: 0 auto;
 }
 
-.map-container {
+.map-wrapper {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  min-height: 500px;
-  background: #f5f5f5;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 #map {
   width: 100% !important;
   height: 100% !important;
-  min-height: 500px;
+  z-index: 1;
+}
+
+label {
+  font-weight: 500;
+}
+
+.search-container {
+  background-color: var(--el-bg-color);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 </style> 

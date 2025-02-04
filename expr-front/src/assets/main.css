@@ -1,9 +1,9 @@
 @import './base.css';
 
 #app {
-  max-width: 1280px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
   font-weight: normal;
   min-height: 100vh;
 }
@@ -31,8 +31,8 @@ a,
 
   #app {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(800px, 1fr));
     gap: 2rem;
-    padding: 0 2rem;
+    padding: 1rem 2rem;
   }
 }
