@@ -1,42 +1,28 @@
 <?php
 
+require_once __DIR__ . '/BaseSchema.php';
+
 /**
  * 仓库数据类
  */
-class StorageSchema {
+class StorageSchema extends BaseSchema {
     /** @var int 仓库ID */
-    public int $id;
+    public int $id = 0;
     
     /** @var string 城市 */
-    public string $city;
+    public string $city = '';
     
     /** @var string 邮政编码 */
-    public string $postal_code;
+    public string $postal_code = '';
     
     /** @var string 详细地址 */
-    public string $detailed_address;
+    public string $detailed_address = '';
     
     /** @var int 仓库容积容量 */
-    public int $capacity_volume_of_the_warehouse;
+    public int $capacity_volume_of_the_warehouse = 0;
     
     /** @var int 仓库重量容量 */
-    public int $capacity_weight_of_the_warehouse;
-
-    /**
-     * 从数组创建仓库对象
-     * @param array<string,mixed> $data 仓库数据
-     * @return self
-     */
-    public static function fromArray(array $data): self {
-        $storage = new self();
-        $storage->id = (int)($data['id'] ?? 0);
-        $storage->city = $data['city'] ?? '';
-        $storage->postal_code = $data['postal_code'] ?? '';
-        $storage->detailed_address = $data['detailed_address'] ?? '';
-        $storage->capacity_volume_of_the_warehouse = (int)($data['capacity_volume_of_the_warehouse'] ?? 0);
-        $storage->capacity_weight_of_the_warehouse = (int)($data['capacity_weight_of_the_warehouse'] ?? 0);
-        return $storage;
-    }
+    public int $capacity_weight_of_the_warehouse = 0;
 
     /**
      * 从实体创建Schema对象
@@ -80,29 +66,14 @@ class StorageSchema {
             && $this->capacity_volume_of_the_warehouse > 0
             && $this->capacity_weight_of_the_warehouse > 0;
     }
-
-    /**
-     * 转换为数组
-     * @return array<string,mixed>
-     */
-    public function toArray(): array {
-        return [
-            'id' => $this->id,
-            'city' => $this->city,
-            'postal_code' => $this->postal_code,
-            'detailed_address' => $this->detailed_address,
-            'capacity_volume_of_the_warehouse' => $this->capacity_volume_of_the_warehouse,
-            'capacity_weight_of_the_warehouse' => $this->capacity_weight_of_the_warehouse
-        ];
-    }
 }
 
 /**
  * 仓库列表响应类
  */
-class ListStorageResponse {
+class ListStorageResponse extends BaseSchema {
     /** @var StorageSchema[] 仓库列表 */
-    public array $storages;
+    public array $storages = [];
 
     /**
      * 创建响应对象
@@ -126,33 +97,17 @@ class ListStorageResponse {
     }
 }
 
-class CreateStorageRequest {
-    public string $city;
-    public string $postal_code;
-    public string $detailed_address;
-    public int $capacity_volume_of_the_warehouse;
-    public int $capacity_weight_of_the_warehouse;
+class CreateStorageRequest extends BaseSchema {
+    public string $city = '';
+    public string $postal_code = '';
+    public string $detailed_address = '';
+    public int $capacity_volume_of_the_warehouse = 0;
+    public int $capacity_weight_of_the_warehouse = 0;
 
-    public static function fromArray(array $data): self {
-        $request = new self();
-        $request->city = $data['city'] ?? '';
-        $request->postal_code = $data['postal_code'] ?? '';
-        $request->detailed_address = $data['detailed_address'] ?? '';
-        $request->capacity_volume_of_the_warehouse = (int)($data['capacity_volume_of_the_warehouse'] ?? 0);
-        $request->capacity_weight_of_the_warehouse = (int)($data['capacity_weight_of_the_warehouse'] ?? 0);
-        return $request;
-    }
-
-    public function toArray(): array {
-        return [
-            'city' => $this->city,
-            'postal_code' => $this->postal_code,
-            'detailed_address' => $this->detailed_address,
-            'capacity_volume_of_the_warehouse' => $this->capacity_volume_of_the_warehouse,
-            'capacity_weight_of_the_warehouse' => $this->capacity_weight_of_the_warehouse
-        ];
-    }
-
+    /**
+     * 验证数据是否有效
+     * @return bool
+     */
     public function validate(): bool {
         return !empty($this->city) 
             && !empty($this->postal_code) 
