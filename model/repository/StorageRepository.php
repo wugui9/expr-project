@@ -26,6 +26,8 @@ class StorageRepository extends BaseRepository
         $storage->city = $row['city'];
         $storage->postal_code = $row['postal_code'];
         $storage->detailed_address = $row['detailed_address'];
+        $storage->latitude = (float)$row['latitude'];
+        $storage->longitude = (float)$row['longitude'];
         $storage->capacity_volume_of_the_warehouse = (int)$row['capacity_volume_of_the_warehouse'];
         $storage->capacity_weight_of_the_warehouse = (int)$row['capacity_weight_of_the_warehouse'];
         

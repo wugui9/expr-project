@@ -18,6 +18,12 @@ class StorageSchema extends BaseSchema {
     /** @var string 详细地址 */
     public string $detailed_address = '';
     
+    /** @var float 纬度 */
+    public float $latitude = 0.0;
+    
+    /** @var float 经度 */
+    public float $longitude = 0.0;
+    
     /** @var int 仓库容积容量 */
     public int $capacity_volume_of_the_warehouse = 0;
     
@@ -35,6 +41,8 @@ class StorageSchema extends BaseSchema {
         $storage->city = $entity->city;
         $storage->postal_code = $entity->postal_code;
         $storage->detailed_address = $entity->detailed_address;
+        $storage->latitude = $entity->latitude;
+        $storage->longitude = $entity->longitude;
         $storage->capacity_volume_of_the_warehouse = $entity->capacity_volume_of_the_warehouse;
         $storage->capacity_weight_of_the_warehouse = $entity->capacity_weight_of_the_warehouse;
         return $storage;
@@ -50,6 +58,8 @@ class StorageSchema extends BaseSchema {
         $storage->city = $this->city;
         $storage->postal_code = $this->postal_code;
         $storage->detailed_address = $this->detailed_address;
+        $storage->latitude = $this->latitude;
+        $storage->longitude = $this->longitude;
         $storage->capacity_volume_of_the_warehouse = $this->capacity_volume_of_the_warehouse;
         $storage->capacity_weight_of_the_warehouse = $this->capacity_weight_of_the_warehouse;
         return $storage;
@@ -64,7 +74,9 @@ class StorageSchema extends BaseSchema {
             && !empty($this->postal_code) 
             && !empty($this->detailed_address)
             && $this->capacity_volume_of_the_warehouse > 0
-            && $this->capacity_weight_of_the_warehouse > 0;
+            && $this->capacity_weight_of_the_warehouse > 0
+            && $this->latitude >= -90 && $this->latitude <= 90
+            && $this->longitude >= -180 && $this->longitude <= 180;
     }
 }
 
