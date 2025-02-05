@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `order` (
     `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `order_number` VARCHAR(255) NOT NULL UNIQUE,
+    `order_number` VARCHAR(32) NOT NULL UNIQUE,
     `sender_id` INT NOT NULL,
     `order_time` DATETIME NOT NULL,
     `paid_amount` DECIMAL(10,2) NOT NULL,
@@ -17,4 +17,4 @@ CREATE TABLE IF NOT EXISTS `order` (
     FOREIGN KEY (`sender_id`) REFERENCES `user`(`id`),
     FOREIGN KEY (`deliverer_id`) REFERENCES `user`(`id`),
     FOREIGN KEY (`relay_point_id`) REFERENCES `storage`(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+);

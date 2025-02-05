@@ -6,7 +6,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Left Column - Map -->
         <div class="bg-gray-100 rounded-lg p-4">
-          <div class="map-wrapper relative bg-gray-100 rounded-lg overflow-hidden" style="height: 600px;">
+          <div class="map-wrapper relative bg-gray-100 rounded-lg overflow-hidden" style="height: 400px;">
             <div id="map" class="absolute inset-0"></div>
             <div v-if="!isMapLoaded" class="absolute inset-0 flex items-center justify-center bg-gray-100/80">
               <el-icon class="text-4xl animate-spin"><Loading /></el-icon>
@@ -16,53 +16,45 @@
 
         <!-- Right Column - Point Selection -->
         <div class="space-y-6">
-          <!-- Search Container -->
-          <div class="search-container">
-            <div class="flex gap-4 items-center">
-              <div class="flex-1">
-                <label class="block mb-1">City</label>
-                <el-input
-                  v-model="selectedCity"
-                  placeholder="Enter city name"
-                  @input="debouncedSearch"
-                />
-              </div>
-              <div class="flex-1">
-                <label class="block mb-1">Postal Code</label>
-                <el-input
-                  v-model="postalCode"
-                  placeholder="Enter postal code"
-                  @input="debouncedSearch"
-                />
-              </div>
-            </div>
-          </div>
+          <!-- City Selection -->
+          <el-form-item label="City">
+            <el-input 
+              v-model="selectedCity" 
+              placeholder="Enter city name"
+              @input="debouncedSearch"
+            />
+          </el-form-item>
 
-          <!-- Status Messages -->
-          <div v-if="loading" class="mb-4">
-            Loading data...
-          </div>
-          <div v-if="error" class="mb-4 text-red-500">
-            {{ error }}
-          </div>
-          <div v-if="filteredStorages.length === 0" class="mb-4">
-            No pickup points found for the current search
-          </div>
-          <div v-else class="mb-4">
-            Found {{ filteredStorages.length }} pickup points
-          </div>
+          <!-- Postal Code -->
+          <el-form-item label="Postal Code">
+            <el-input 
+              v-model="postalCode" 
+              placeholder="Enter postal code"
+              @input="debouncedSearch"
+            />
+          </el-form-item>
 
           <!-- Pickup Point Selection -->
           <div class="space-y-4">
             <h3 class="text-lg font-semibold">Available Pickup Points</h3>
+            <div v-if="loading" class="text-gray-500">
+              Loading pickup points...
+            </div>
+            <div v-else-if="error" class="text-red-500">
+              {{ error }}
+            </div>
+            <div v-else-if="filteredStorages.length === 0" class="text-gray-500">
+              No pickup points found for the current search
+            </div>
             <el-radio-group 
+              v-else
               v-model="selectedPointId" 
               class="flex flex-col space-y-4"
             >
               <el-radio 
                 v-for="point in filteredStorages" 
                 :key="point.id" 
-                :value="point.id"
+                :label="point.id"
                 class="w-full p-4 border rounded-lg"
                 @change="selectPoint(point)"
               >
@@ -89,18 +81,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Info Window Template -->
-  <template id="info-window-template">
-    <div style="padding: 1rem; max-width: 20rem;">
-      <h3 style="font-weight: bold; margin-bottom: 0.5rem;"></h3>
-      <p class="city" style="margin-bottom: 0.25rem;"></p>
-      <p class="address" style="margin-bottom: 0.25rem;"></p>
-      <p class="postal" style="margin-bottom: 0.25rem;"></p>
-      <p class="volume" style="margin-bottom: 0.25rem;"></p>
-      <p class="weight" style="margin-bottom: 0.25rem;"></p>
-    </div>
-  </template>
 </template>
 
 <script>
@@ -200,28 +180,8 @@ export default {
         if (!isNaN(lat) && !isNaN(lng)) {
           this.map.setCenter({ lat, lng })
           this.map.setZoom(15)
-
-          // Trigger click on the corresponding marker
-          const marker = this.markers.find(m => m.storage.id === point.id)
-          if (marker) {
-            google.maps.event.trigger(marker, 'click')
-          }
         }
       }
-    },
-
-    createInfoWindow(storage) {
-      const template = document.getElementById('info-window-template');
-      const content = template.content.cloneNode(true);
-      
-      content.querySelector('h3').textContent = 'Point ' + storage.id;
-      content.querySelector('.city').textContent = 'City: ' + storage.city;
-      content.querySelector('.address').textContent = 'Address: ' + storage.detailed_address;
-      content.querySelector('.postal').textContent = 'Postal Code: ' + storage.postal_code;
-      content.querySelector('.volume').textContent = 'Volume: ' + storage.capacity_volume_of_the_warehouse + ' m3';
-      content.querySelector('.weight').textContent = 'Weight: ' + storage.capacity_weight_of_the_warehouse + ' kg';
-
-      return content;
     },
 
     addMarkers() {
@@ -233,33 +193,39 @@ export default {
         
         if (!isNaN(lat) && !isNaN(lng)) {
           const position = { lat, lng }
-
-          // Create marker content
-          const markerContent = document.createElement('div')
-          markerContent.className = 'marker-content'
-          markerContent.style.backgroundColor = '#4B5563'
-          markerContent.style.color = '#FFFFFF'
-          markerContent.style.padding = '4px 8px'
-          markerContent.style.borderRadius = '50%'
-          markerContent.style.border = '2px solid #FFFFFF'
-          markerContent.style.fontSize = '14px'
-          markerContent.style.fontWeight = 'bold'
-          markerContent.style.minWidth = '24px'
-          markerContent.style.height = '24px'
-          markerContent.style.display = 'flex'
-          markerContent.style.alignItems = 'center'
-          markerContent.style.justifyContent = 'center'
-          markerContent.textContent = storage.id
           
-          const marker = new google.maps.marker.AdvancedMarkerElement({
-            map: this.map,
+          const marker = new google.maps.Marker({
             position,
+            map: this.map,
             title: storage.detailed_address,
-            content: markerContent
+            animation: google.maps.Animation.DROP,
+            label: {
+              text: `${storage.id}`,
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            },
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: '#4B5563',
+              fillOpacity: 1,
+              strokeColor: '#FFFFFF',
+              strokeWeight: 2
+            }
           })
 
           const infoWindow = new google.maps.InfoWindow({
-            content: "Point " + storage.id + " - " + storage.detailed_address
+            content: `
+              <div class="p-4 max-w-xs">
+                <h3 class="font-bold text-lg mb-2">Point ${storage.id}</h3>
+                <p class="mb-1"><strong>City:</strong> ${storage.city}</p>
+                <p class="mb-1"><strong>Address:</strong> ${storage.detailed_address}</p>
+                <p class="mb-1"><strong>Postal Code:</strong> ${storage.postal_code}</p>
+                <p class="mb-1"><strong>Volume Capacity:</strong> ${storage.capacity_volume_of_the_warehouse} m³</p>
+                <p class="mb-1"><strong>Weight Capacity:</strong> ${storage.capacity_weight_of_the_warehouse} kg</p>
+              </div>
+            `
           })
 
           marker.addListener('click', () => {
@@ -269,23 +235,18 @@ export default {
                 m.infoWindow.close()
               }
             })
-            infoWindow.open({
-              anchor: marker,
-              map: this.map
-            })
-            // Select the point in the list
+            infoWindow.open(this.map, marker)
             this.selectPoint(storage)
           })
 
           marker.infoWindow = infoWindow
-          marker.storage = storage
           this.markers.push(marker)
         }
       })
 
       if (this.markers.length > 0) {
         const bounds = new google.maps.LatLngBounds()
-        this.markers.forEach(marker => bounds.extend(marker.position))
+        this.markers.forEach(marker => bounds.extend(marker.getPosition()))
         this.map.fitBounds(bounds)
         this.map.setZoom(this.map.getZoom() - 1)
       }
@@ -295,7 +256,7 @@ export default {
       console.log('Loading Google Maps script...')
       if (!window.google && !this.isMapScriptLoaded) {
         const script = document.createElement('script')
-        script.src = \`https://maps.googleapis.com/maps/api/js?key=AIzaSyCseBl7rta84SCHJ2N9Knh6iFKFJIpK1Ns&libraries=places,marker\`
+        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCseBl7rta84SCHJ2N9Knh6iFKFJIpK1Ns&libraries=places,marker`
         script.async = true
         script.defer = true
         script.onload = () => {
@@ -372,19 +333,5 @@ export default {
 .el-radio.is-bordered {
   margin-right: 0;
   margin-bottom: 10px;
-}
-
-.map-wrapper {
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-.marker-content {
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.marker-content:hover {
-  transform: scale(1.1);
 }
 </style> 

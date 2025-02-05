@@ -64,6 +64,8 @@
 </template>
 
 <script>
+import { ElMessage } from 'element-plus'
+
 export default {
   name: 'ParcelRecipientView',
   data() {
@@ -82,8 +84,6 @@ export default {
   },
   computed: {
     isPickupDelivery() {
-      // Get the delivery location from the previous page's state
-      // In a real application, this would come from Vuex/Pinia state management
       return this.$route.query.deliveryLocation === 'pickup'
     }
   },
@@ -91,15 +91,41 @@ export default {
     goBack() {
       this.$router.push('/parcel')
     },
-    validateAndProceed() {
-      if (this.isPickupDelivery) {
-        // If pickup delivery, go to pickup point selection
-        this.$router.push('/parcel/pickup-point')
-      } else {
-        // If home delivery, show success message
-        this.$message({
-          message: 'Shipment validated successfully!',
-          type: 'success'
+    async validateAndProceed() {
+      // Basic form validation
+      if (!this.recipientForm.lastName || !this.recipientForm.firstName || 
+          !this.recipientForm.phone || !this.recipientForm.email) {
+        ElMessage({
+          message: 'Please fill in all required fields',
+          type: 'warning'
+        })
+        return
+      }
+
+      try {
+        if (this.isPickupDelivery) {
+          // If pickup delivery, go to pickup point selection
+          await this.$router.push({
+            path: '/parcel/pickup-point',
+            query: {
+              ...this.$route.query,
+              recipient: JSON.stringify(this.recipientForm)
+            }
+          })
+        } else {
+          // If home delivery, show success message and submit the form
+          ElMessage({
+            message: 'Shipment validated successfully!',
+            type: 'success'
+          })
+          // Here you would typically submit the form data to your backend
+          console.log('Form data:', this.recipientForm)
+        }
+      } catch (error) {
+        console.error('Navigation error:', error)
+        ElMessage({
+          message: 'Navigation failed. Please try again.',
+          type: 'error'
         })
       }
     }

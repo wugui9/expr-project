@@ -12,7 +12,7 @@ class UserSchema extends BaseSchema {
             'email' => ['required', 'email'],
             'password' => ['required', 'string', 'min:8'],
             'salt' => ['required', 'string', 'size:32'],
-            'role' => ['required', 'string', 'in:ADMIN,CUSTOMER,DELIVERY_DRIVER,STORE_KEEPER']
+            'role' => ['required', 'string', 'in:ADMIN,CUSTOMER,DELIVERY_DRIVER']
         ];
     }
 } 
