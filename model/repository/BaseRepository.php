@@ -30,7 +30,7 @@ abstract class BaseRepository
             return null;
         }
 
-        $request = "SELECT * FROM {$this->table} WHERE id = :id";
+        $request = "SELECT * FROM `{$this->table}` WHERE id = :id";
         $statement = $this->db->prepare($request);
         $statement->execute(['id' => $id]);
         return $statement->fetch();
@@ -46,7 +46,7 @@ abstract class BaseRepository
             return [];
         }
 
-        $request = "SELECT * FROM {$this->table}";
+        $request = "SELECT * FROM `{$this->table}`";
         $statement = $this->db->prepare($request);
         $statement->execute();
         return $statement->fetchAll();
@@ -66,7 +66,7 @@ abstract class BaseRepository
         $columns = implode(', ', array_keys($data));
         $values = ':' . implode(', :', array_keys($data));
         
-        $request = "INSERT INTO {$this->table} ($columns) VALUES ($values)";
+        $request = "INSERT INTO `{$this->table}` ($columns) VALUES ($values)";
         $statement = $this->db->prepare($request);
         return $statement->execute($data);
     }
@@ -89,7 +89,7 @@ abstract class BaseRepository
         }
         $setClause = implode(', ', $setClause);
         
-        $request = "UPDATE {$this->table} SET $setClause WHERE id = :id";
+        $request = "UPDATE `{$this->table}` SET $setClause WHERE id = :id";
         $data['id'] = $id;
         
         $statement = $this->db->prepare($request);
@@ -107,7 +107,7 @@ abstract class BaseRepository
             return false;
         }
 
-        $request = "DELETE FROM {$this->table} WHERE id = :id";
+        $request = "DELETE FROM `{$this->table}` WHERE id = :id";
         $statement = $this->db->prepare($request);
         return $statement->execute(['id' => $id]);
     }
@@ -129,7 +129,7 @@ abstract class BaseRepository
         }
         $whereClause = implode(' AND ', $whereClause);
         
-        $request = "SELECT * FROM {$this->table} WHERE $whereClause";
+        $request = "SELECT * FROM `{$this->table}` WHERE $whereClause";
         $statement = $this->db->prepare($request);
         $statement->execute($criteria);
         return $statement->fetchAll();

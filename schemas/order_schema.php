@@ -72,4 +72,69 @@ $order_response_schema = [
 $orders_list_response_schema = [
     'type' => 'array',
     'items' => $order_response_schema
-]; 
+];
+
+function validateOrderSchema($data) {
+    $required_fields = [
+        'sender_id',
+        'paid_amount',
+        'payment_method',
+        'shipping_address',
+        'delivery_address',
+        'recipient_lastname',
+        'recipient_firstname',
+        'recipient_phone',
+        'weight',
+        'delivery_level'
+    ];
+
+    $errors = [];
+
+    // Check required fields
+    foreach ($required_fields as $field) {
+        if (!isset($data[$field]) || empty($data[$field])) {
+            $errors[] = "Field '$field' is required";
+        }
+    }
+
+    // Validate data types and ranges
+    if (isset($data['sender_id']) && !is_int($data['sender_id'])) {
+        $errors[] = "sender_id must be an integer";
+    }
+
+    if (isset($data['paid_amount'])) {
+        if (!is_numeric($data['paid_amount']) || $data['paid_amount'] < 0) {
+            $errors[] = "paid_amount must be a positive number";
+        }
+    }
+
+    if (isset($data['weight'])) {
+        if (!is_int($data['weight']) || $data['weight'] <= 0) {
+            $errors[] = "weight must be a positive integer";
+        }
+    }
+
+    if (isset($data['delivery_level']) && !in_array($data['delivery_level'], ['fast', 'normal'])) {
+        $errors[] = "delivery_level must be either 'fast' or 'normal'";
+    }
+
+    if (isset($data['deliverer_id']) && !is_null($data['deliverer_id']) && !is_int($data['deliverer_id'])) {
+        $errors[] = "deliverer_id must be an integer or null";
+    }
+
+    if (isset($data['relay_point_id']) && !is_null($data['relay_point_id']) && !is_int($data['relay_point_id'])) {
+        $errors[] = "relay_point_id must be an integer or null";
+    }
+
+    // Phone number validation
+    if (isset($data['recipient_phone'])) {
+        if (!preg_match('/^\+?[0-9]{10,15}$/', $data['recipient_phone'])) {
+            $errors[] = "recipient_phone must be a valid phone number";
+        }
+    }
+
+    return [
+        'valid' => empty($errors),
+        'errors' => $errors
+    ];
+} 

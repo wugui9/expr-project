@@ -34,7 +34,7 @@ function generateJWT(array $payload, string $secret): string {
 /**
  * Handle user login request
  * @param array<string,mixed> $data Login credentials
- * @return array<string,mixed> User data with JWT token
+ * @return array<string,mixed> User data
  * @throws Exception When login fails
  */
 function handleLogin(array $data): array
@@ -73,17 +73,16 @@ function handleLogin(array $data): array
     $token = generateJWT($payload, $jwt_secret);
 
     // Set JWT token in HTTP-only cookie
-    $cookie_options = [
+    setcookie('jwt_token', $token, [
         'expires' => $expirationTime,
         'path' => '/',
         'domain' => '',
         'secure' => true,
         'httponly' => true,
         'samesite' => 'Strict'
-    ];
-    setcookie('jwt_token', $token, $cookie_options);
+    ]);
 
-    // Return user data with token
+    // Return user data without token
     $response = LoginResponse::fromEntity($user, $token);
     return $response->toArray();
 }

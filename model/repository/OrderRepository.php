@@ -1,30 +1,59 @@
 <?php
 
+require_once __DIR__ . '/../php/DBModel.php';
 require_once __DIR__ . '/../entities/Order.php';
+require_once __DIR__ . '/BaseRepository.php';
 
-class OrderRepository {
-    private PDO $db;
-
-    public function __construct(PDO $db) {
-        $this->db = $db;
+class OrderRepository extends BaseRepository {
+    public function __construct($connection) 
+    {
+        parent::__construct($connection, 'order');
     }
 
-    public function create(Order $order): bool {
-        $sql = "INSERT INTO `order` (
-            order_number, sender_id, order_time, paid_amount, 
-            payment_method, shipping_address, delivery_address,
-            recipient_lastname, recipient_firstname, recipient_phone,
-            weight, delivery_level, deliverer_id, relay_point_id
-        ) VALUES (
-            :order_number, :sender_id, :order_time, :paid_amount,
-            :payment_method, :shipping_address, :delivery_address,
-            :recipient_lastname, :recipient_firstname, :recipient_phone,
-            :weight, :delivery_level, :deliverer_id, :relay_point_id
-        )";
 
-        $stmt = $this->db->prepare($sql);
-        
-        return $stmt->execute([
+    /**
+     * Convert database row to Order entity
+     * @param array $row Database row
+     * @return Order|null
+     */
+    private function mapToEntity($row): ?Order {
+        if (!$row) {
+            return null;
+        }
+
+        $order = new Order(
+            $row['order_number'],
+            $row['sender_id'],
+            new DateTime($row['order_time']),
+            $row['paid_amount'],
+            $row['payment_method'],
+            $row['shipping_address'],
+            $row['delivery_address'],
+            $row['recipient_lastname'],
+            $row['recipient_firstname'],
+            $row['recipient_phone'],
+            $row['weight'],
+            $row['delivery_level'],
+            $row['deliverer_id'],
+            $row['relay_point_id']
+        );
+
+        // Set the ID
+        $reflectionClass = new ReflectionClass('Order');
+        $idProperty = $reflectionClass->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($order, $row['id']);
+
+        return $order;
+    }
+
+    /**
+     * Save a new order
+     * @param Order $order
+     * @return Order|null
+     */
+    public function save(Order $order): ?Order {
+        $data = [
             'order_number' => $order->getOrderNumber(),
             'sender_id' => $order->getSenderId(),
             'order_time' => $order->getOrderTime()->format('Y-m-d H:i:s'),
@@ -39,91 +68,81 @@ class OrderRepository {
             'delivery_level' => $order->getDeliveryLevel(),
             'deliverer_id' => $order->getDelivererId(),
             'relay_point_id' => $order->getRelayPointId()
-        ]);
-    }
+        ];
 
-    public function findById(int $id): ?Order {
-        $sql = "SELECT * FROM `order` WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$result) {
-            return null;
+        if ($this->create($data)) {
+            return $this->findByOrderNumber($order->getOrderNumber());
         }
 
-        return $this->createOrderFromArray($result);
+        return null;
     }
 
+    /**
+     * Find order by ID
+     * @param mixed $id
+     * @return Order|null
+     */
+    public function findById($id): ?Order {
+        $row = parent::findById($id);
+        return $this->mapToEntity($row);
+    }
+
+    /**
+     * Find order by order number
+     * @param string $orderNumber
+     * @return Order|null
+     */
     public function findByOrderNumber(string $orderNumber): ?Order {
-        $sql = "SELECT * FROM `order` WHERE order_number = :order_number";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['order_number' => $orderNumber]);
-        
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$result) {
-            return null;
-        }
-
-        return $this->createOrderFromArray($result);
+        $rows = $this->findBy(['order_number' => $orderNumber]);
+        return !empty($rows) ? $this->mapToEntity($rows[0]) : null;
     }
 
+    /**
+     * Find orders by sender ID
+     * @param int $senderId
+     * @return Order[]
+     */
     public function findBySenderId(int $senderId): array {
-        $sql = "SELECT * FROM `order` WHERE sender_id = :sender_id ORDER BY order_time DESC";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['sender_id' => $senderId]);
-        
-        return array_map([$this, 'createOrderFromArray'], $stmt->fetchAll(PDO::FETCH_ASSOC));
+        $rows = $this->findBy(['sender_id' => $senderId]);
+        return array_map([$this, 'mapToEntity'], $rows);
     }
 
+    /**
+     * Find orders by deliverer ID
+     * @param int $delivererId
+     * @return Order[]
+     */
     public function findByDelivererId(int $delivererId): array {
-        $sql = "SELECT * FROM `order` WHERE deliverer_id = :deliverer_id ORDER BY order_time DESC";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['deliverer_id' => $delivererId]);
-        
-        return array_map([$this, 'createOrderFromArray'], $stmt->fetchAll(PDO::FETCH_ASSOC));
+        $rows = $this->findBy(['deliverer_id' => $delivererId]);
+        return array_map([$this, 'mapToEntity'], $rows);
     }
 
+    /**
+     * Assign deliverer to order
+     * @param int $id
+     * @param int|null $delivererId
+     * @return bool
+     */
     public function assignDeliverer(int $id, ?int $delivererId): bool {
-        $sql = "UPDATE `order` SET deliverer_id = :deliverer_id WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            'deliverer_id' => $delivererId,
-            'id' => $id
-        ]);
+        return $this->update($id, ['deliverer_id' => $delivererId]);
     }
 
+    /**
+     * Assign relay point to order
+     * @param int $id
+     * @param int|null $relayPointId
+     * @return bool
+     */
     public function assignRelayPoint(int $id, ?int $relayPointId): bool {
-        $sql = "UPDATE `order` SET relay_point_id = :relay_point_id WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            'relay_point_id' => $relayPointId,
-            'id' => $id
-        ]);
+        return $this->update($id, ['relay_point_id' => $relayPointId]);
     }
 
+    /**
+     * Get all orders
+     * @return Order[]
+     */
     public function findAll(): array {
-        $sql = "SELECT * FROM `order` ORDER BY order_time DESC";
-        $stmt = $this->db->query($sql);
-        return array_map([$this, 'createOrderFromArray'], $stmt->fetchAll(PDO::FETCH_ASSOC));
-    }
-
-    private function createOrderFromArray(array $data): Order {
-        return new Order(
-            $data['order_number'],
-            $data['sender_id'],
-            new DateTime($data['order_time']),
-            $data['paid_amount'],
-            $data['payment_method'],
-            $data['shipping_address'],
-            $data['delivery_address'],
-            $data['recipient_lastname'],
-            $data['recipient_firstname'],
-            $data['recipient_phone'],
-            $data['weight'],
-            $data['delivery_level'],
-            $data['deliverer_id'],
-            $data['relay_point_id']
-        );
+        $rows = parent::findAll();
+        return array_map([$this, 'mapToEntity'], $rows);
     }
 } 

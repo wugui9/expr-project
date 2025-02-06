@@ -135,14 +135,11 @@ class LoginResponse extends BaseSchema {
     
     /** @var string 角色 */
     public string $role = '';
-    
-    /** @var string JWT令牌 */
-    public string $token = '';
 
     /**
      * 从实体创建响应对象
      * @param User $user 用户实体
-     * @param string $token JWT令牌
+     * @param string $token JWT令牌 (用于设置cookie，不返回给客户端)
      * @return self
      */
     public static function fromEntity(User $user, string $token): self {
@@ -152,7 +149,6 @@ class LoginResponse extends BaseSchema {
         $instance->firstname = $user->firstname;
         $instance->lastname = $user->lastname;
         $instance->role = $user->role;
-        $instance->token = $token;
         return $instance;
     }
 
@@ -166,8 +162,7 @@ class LoginResponse extends BaseSchema {
             'email' => $this->email,
             'firstname' => $this->firstname,
             'lastname' => $this->lastname,
-            'role' => $this->role,
-            'token' => $this->token
+            'role' => $this->role
         ];
     }
 } 
