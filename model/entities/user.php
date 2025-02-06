@@ -9,7 +9,7 @@ class User {
     public string $email;
     public string $password;
     public string $salt;
-    public int $role;
+    public string $role;
 }
 
 ?>
