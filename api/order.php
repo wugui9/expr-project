@@ -22,6 +22,7 @@ function handleCreateOrder(array $data): array {
         'recipient_lastname',
         'recipient_firstname',
         'recipient_phone',
+        'shipping_address',
         'delivery_address'
     ];
     
@@ -41,7 +42,7 @@ function handleCreateOrder(array $data): array {
         new DateTime(),
         $data['paid_amount'],
         strtoupper($data['payment_method']), // Convert to uppercase to match enum
-        $data['delivery_address'], // TODO: Get shipping address from sender's profile
+        $data['shipping_address'],
         $data['delivery_address'],
         $data['recipient_lastname'],
         $data['recipient_firstname'],
