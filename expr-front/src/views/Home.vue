@@ -6,12 +6,12 @@
       <!-- My Package Card -->
       <el-card 
         class="hover:shadow-xl transition-shadow cursor-pointer h-64 flex flex-col items-center justify-center"
-        @click="handleCardClick('package')"
+        @click="handleCardClick('parcel')"
       >
         <div class="text-center">
           <el-icon class="text-4xl mb-4"><Box /></el-icon>
-          <h2 class="text-xl font-semibold mb-2">My Package</h2>
-          <p class="text-gray-600">Track and manage your packages</p>
+          <h2 class="text-xl font-semibold mb-2">Send Package</h2>
+          <p class="text-gray-600">Send your package to your destination</p>
         </div>
       </el-card>
 
@@ -55,8 +55,8 @@ export default {
   methods: {
     handleCardClick(type) {
       switch(type) {
-        case 'package':
-          this.$router.push('/my-package')
+        case 'parcel':
+          this.$router.push('/parcel')
           break
         case 'pickup':
           this.$router.push('/storage')
