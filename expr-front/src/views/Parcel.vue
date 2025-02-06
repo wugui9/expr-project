@@ -95,31 +95,31 @@
         <h2 class="text-xl font-semibold mb-4">Summary</h2>
         <div class="space-y-4">
           <div class="flex justify-between">
-            <span>Receipt</span>
+            <b>Receipt:</b>
             <span>{{ parcelForm.receipt }}</span>
           </div>
           <div class="flex justify-between">
-            <span>Weight</span>
+            <b>Weight:</b>
             <span>{{ parcelForm.weight }} kg</span>
           </div>
           <div class="flex justify-between">
-            <span>Destination</span>
+            <b>Destination:</b>
             <span>{{ parcelForm.postalCode }}</span>
           </div>
           <div v-if="parcelForm.hasInsurance" class="flex justify-between">
-            <span>Compensation</span>
+            <b>Compensation:</b>
             <span>{{ parcelForm.compensation }}€</span>
           </div>
           <div class="flex justify-between">
-            <span>Delivery Time</span>
+            <b>Delivery Time:</b>
             <span>{{ deliveryTime }}</span>
           </div>
           <div v-if="parcelForm.hasInsurance" class="flex justify-between">
-            <span>Insurance</span>
+            <b>Insurance:</b>
             <span>{{ insuranceAmount }}€</span>
           </div>
           <div class="flex justify-between font-bold">
-            <span>Total Cost</span>
+            <b>Total Cost:</b>
             <span>{{ totalCost }}€</span>
           </div>
         </div>
