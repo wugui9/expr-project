@@ -338,6 +338,7 @@ export default {
         
         // Add relay point to order data
         orderData.relay_point_id = this.selectedPoint.id
+        orderData.shipping_address = this.selectedPoint.detailed_address // Set shipping address to pickup point address
 
         // Submit order
         const response = await axios.post('/api/order/orders', orderData)

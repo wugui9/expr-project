@@ -154,7 +154,9 @@ export default {
           recipient_firstname: this.recipientForm.firstName,
           recipient_phone: this.recipientForm.phone,
           delivery_address: this.recipientForm.address,
-          payment_method: 'CARD' // Default to card payment
+          delivery_address_complement: this.recipientForm.addressComplement,
+          shipping_address: this.isPickupDelivery ? '' : this.recipientForm.address, // Will be set to pickup point address later if isPickupDelivery
+          payment_method: 'CARD'
         }
 
         if (this.isPickupDelivery) {
