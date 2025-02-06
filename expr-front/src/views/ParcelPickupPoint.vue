@@ -16,59 +16,65 @@
 
         <!-- Right Column - Point Selection -->
         <div class="space-y-6">
-          <!-- City Selection -->
-          <el-form-item label="City">
-            <el-input 
-              v-model="selectedCity" 
-              placeholder="Enter city name"
-              @input="debouncedSearch"
-            />
-          </el-form-item>
+          <form id="pickup-point-form" @submit.prevent>
+            <!-- City Selection -->
+            <el-form-item label="City">
+              <el-input 
+                v-model="selectedCity" 
+                placeholder="Enter city name"
+                @input="debouncedSearch"
+                name="city"
+                autocomplete="shipping address-level2"
+              />
+            </el-form-item>
 
-          <!-- Postal Code -->
-          <el-form-item label="Postal Code">
-            <el-input 
-              v-model="postalCode" 
-              placeholder="Enter postal code"
-              @input="debouncedSearch"
-            />
-          </el-form-item>
+            <!-- Postal Code -->
+            <el-form-item label="Postal Code">
+              <el-input 
+                v-model="postalCode" 
+                placeholder="Enter postal code"
+                @input="debouncedSearch"
+                name="postal-code"
+                autocomplete="shipping postal-code"
+              />
+            </el-form-item>
 
-          <!-- Pickup Point Selection -->
-          <div class="space-y-4">
-            <h3 class="text-lg font-semibold">Available Pickup Points</h3>
-            <div v-if="loading" class="text-gray-500">
-              Loading pickup points...
-            </div>
-            <div v-else-if="error" class="text-red-500">
-              {{ error }}
-            </div>
-            <div v-else-if="filteredStorages.length === 0" class="text-gray-500">
-              No pickup points found for the current search
-            </div>
-            <el-radio-group 
-              v-else
-              v-model="selectedPointId" 
-              class="flex flex-col space-y-4"
-            >
-              <el-radio 
-                v-for="point in filteredStorages" 
-                :key="point.id" 
-                :value="point.id"
-                class="w-full p-4 border rounded-lg"
-                @change="selectPoint(point)"
+            <!-- Pickup Point Selection -->
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold">Available Pickup Points</h3>
+              <div v-if="loading" class="text-gray-500">
+                Loading pickup points...
+              </div>
+              <div v-else-if="error" class="text-red-500">
+                {{ error }}
+              </div>
+              <div v-else-if="filteredStorages.length === 0" class="text-gray-500">
+                No pickup points found for the current search
+              </div>
+              <el-radio-group 
+                v-else
+                v-model="selectedPointId" 
+                class="flex flex-col space-y-4"
               >
-                <div class="flex flex-col">
-                  <span class="font-semibold">Point {{ point.id }}</span>
-                  <span class="text-sm text-gray-600">{{ point.detailed_address }}</span>
-                  <span class="text-sm text-gray-600">{{ point.city }}, {{ point.postal_code }}</span>
-                  <span class="text-sm text-gray-600">
-                    Capacity: {{ point.capacity_volume_of_the_warehouse }}m³ / {{ point.capacity_weight_of_the_warehouse }}kg
-                  </span>
-                </div>
-              </el-radio>
-            </el-radio-group>
-          </div>
+                <el-radio 
+                  v-for="point in filteredStorages" 
+                  :key="point.id" 
+                  :value="point.id"
+                  class="w-full p-4 border rounded-lg"
+                  @change="selectPoint(point)"
+                >
+                  <div class="flex flex-col">
+                    <span class="font-semibold">Point {{ point.id }}</span>
+                    <span class="text-sm text-gray-600">{{ point.detailed_address }}</span>
+                    <span class="text-sm text-gray-600">{{ point.city }}, {{ point.postal_code }}</span>
+                    <span class="text-sm text-gray-600">
+                      Capacity: {{ point.capacity_volume_of_the_warehouse }}m³ / {{ point.capacity_weight_of_the_warehouse }}kg
+                    </span>
+                  </div>
+                </el-radio>
+              </el-radio-group>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -317,11 +323,36 @@ export default {
       this.$router.push('/parcel/recipient')
     },
 
-    proceed() {
-      if (this.selectedPoint) {
+    async proceed() {
+      if (!this.selectedPoint) {
         ElMessage({
-          message: 'Pickup point selected successfully!',
+          message: 'Please select a pickup point',
+          type: 'warning'
+        })
+        return
+      }
+
+      try {
+        // Get order data from route query
+        const orderData = JSON.parse(this.$route.query.orderData || '{}')
+        
+        // Add relay point to order data
+        orderData.relay_point_id = this.selectedPoint.id
+
+        // Submit order
+        const response = await axios.post('/api/order/orders', orderData)
+        
+        ElMessage({
+          message: 'Order created successfully!',
           type: 'success'
+        })
+
+        // Redirect to orders list
+        this.$router.push('/orders')
+      } catch (error) {
+        ElMessage({
+          message: error.response?.data?.error || 'Failed to create order',
+          type: 'error'
         })
       }
     }

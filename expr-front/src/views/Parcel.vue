@@ -53,10 +53,10 @@
           <div class="space-y-4">
             <el-radio-group v-model="parcelForm.deliverySpeed">
               <div class="flex items-center space-x-2">
-                <el-radio :label="'fast'">Fast (Delivery in 2j+2€)</el-radio>
+                <el-radio :label="'EXPRESS'">Fast (Delivery in 2j+2€)</el-radio>
               </div>
               <div class="flex items-center space-x-2">
-                <el-radio :label="'normal'">Normal (Delivery in 7j, free)</el-radio>
+                <el-radio :label="'STANDARD'">Normal (Delivery in 7j, free)</el-radio>
               </div>
             </el-radio-group>
           </div>
@@ -131,10 +131,7 @@
       <el-button 
         type="primary" 
         class="w-32" 
-        @click="$router.push({
-          path: '/parcel/recipient',
-          query: { deliveryLocation: parcelForm.deliveryLocation }
-        })"
+        @click="validateAndProceed"
       >
         Next Page
       </el-button>
@@ -144,6 +141,7 @@
 
 <script>
 import { House, Location } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 export default {
   name: 'ParcelView',
@@ -158,7 +156,7 @@ export default {
         postalCode: '',
         hasInsurance: false,
         compensation: 25,
-        deliverySpeed: 'normal',
+        deliverySpeed: 'STANDARD',
         deliveryLocation: 'home',
         receipt: this.generateReceipt()
       }
@@ -166,7 +164,7 @@ export default {
   },
   computed: {
     deliveryTime() {
-      return this.parcelForm.deliverySpeed === 'fast' ? '2 days' : '7 days'
+      return this.parcelForm.deliverySpeed === 'EXPRESS' ? '2 days' : '7 days'
     },
     insuranceAmount() {
       return this.parcelForm.hasInsurance ? this.parcelForm.compensation * 0.01 : 0
@@ -174,7 +172,7 @@ export default {
     totalCost() {
       let cost = 0
       // Add delivery cost
-      if (this.parcelForm.deliverySpeed === 'fast') {
+      if (this.parcelForm.deliverySpeed === 'EXPRESS') {
         cost += 2
       }
       // Add insurance cost only if insurance is selected
@@ -189,6 +187,31 @@ export default {
   methods: {
     generateReceipt() {
       return Math.random().toString(36).substring(2, 10).toUpperCase()
+    },
+    async validateAndProceed() {
+      // Prepare order data
+      const orderData = {
+        weight: this.parcelForm.weight,
+        delivery_level: this.parcelForm.deliverySpeed,
+        paid_amount: parseFloat(this.totalCost),
+        payment_method: 'CARD'
+      }
+
+      try {
+        // Navigate to recipient page with order data
+        await this.$router.push({
+          path: '/parcel/recipient',
+          query: { 
+            deliveryLocation: this.parcelForm.deliveryLocation,
+            parcelData: JSON.stringify(orderData)
+          }
+        })
+      } catch (error) {
+        ElMessage({
+          message: 'Navigation failed. Please try again.',
+          type: 'error'
+        })
+      }
     }
   }
 }
