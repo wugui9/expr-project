@@ -6,8 +6,8 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Left Column - Map -->
         <div class="bg-gray-100 rounded-lg p-4">
-          <div class="map-wrapper relative bg-gray-100 rounded-lg overflow-hidden" style="height: 400px;">
-            <div id="map" class="absolute inset-0"></div>
+          <div class="map-container relative bg-gray-100 rounded-lg overflow-hidden" style="height: 400px; width: 100%;">
+            <div id="map" class="absolute inset-0 w-full h-full"></div>
             <div v-if="!isMapLoaded" class="absolute inset-0 flex items-center justify-center bg-gray-100/80">
               <el-icon class="text-4xl animate-spin"><Loading /></el-icon>
             </div>
@@ -54,7 +54,7 @@
               <el-radio 
                 v-for="point in filteredStorages" 
                 :key="point.id" 
-                :label="point.id"
+                :value="point.id"
                 class="w-full p-4 border rounded-lg"
                 @change="selectPoint(point)"
               >
@@ -256,7 +256,7 @@ export default {
       console.log('Loading Google Maps script...')
       if (!window.google && !this.isMapScriptLoaded) {
         const script = document.createElement('script')
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCseBl7rta84SCHJ2N9Knh6iFKFJIpK1Ns&libraries=places,marker`
+        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCseBl7rta84SCHJ2N9Knh6iFKFJIpK1Ns&libraries=places`
         script.async = true
         script.defer = true
         script.onload = () => {
@@ -333,5 +333,20 @@ export default {
 .el-radio.is-bordered {
   margin-right: 0;
   margin-bottom: 10px;
+}
+
+.map-container {
+  position: relative;
+  min-height: 400px;
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
 }
 </style> 
