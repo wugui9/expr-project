@@ -168,21 +168,13 @@ export default {
             }
           })
         } else {
-          // If home delivery, submit the order
-          try {
-            const response = await axios.post('/api/order/orders', orderData)
-            ElMessage({
-              message: 'Order created successfully!',
-              type: 'success'
-            })
-            // Redirect to order confirmation or orders list
-            this.$router.push('/orders')
-          } catch (error) {
-            ElMessage({
-              message: error.response?.data?.error || 'Failed to create order',
-              type: 'error'
-            })
-          }
+          // If home delivery, go to summary page
+          await this.$router.push({
+            path: '/parcel/summary',
+            query: {
+              orderData: JSON.stringify(orderData)
+            }
+          })
         }
       } catch (error) {
         console.error('Navigation error:', error)

@@ -338,21 +338,19 @@ export default {
         
         // Add relay point to order data
         orderData.relay_point_id = this.selectedPoint.id
-        orderData.shipping_address = this.selectedPoint.detailed_address // Set shipping address to pickup point address
+        orderData.shipping_address = this.selectedPoint.detailed_address
 
-        // Submit order
-        const response = await axios.post('/api/order/orders', orderData)
-        
-        ElMessage({
-          message: 'Order created successfully!',
-          type: 'success'
+        // Go to summary page
+        await this.$router.push({
+          path: '/parcel/summary',
+          query: {
+            orderData: JSON.stringify(orderData)
+          }
         })
-
-        // Redirect to orders list
-        this.$router.push('/orders')
       } catch (error) {
+        console.error('Navigation error:', error)
         ElMessage({
-          message: error.response?.data?.error || 'Failed to create order',
+          message: 'Navigation failed. Please try again.',
           type: 'error'
         })
       }

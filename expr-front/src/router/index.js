@@ -36,11 +36,21 @@ const routes = [
     path: '/parcel/pickup-point',
     name: 'ParcelPickupPoint',
     component: ParcelPickupPoint,
+  },
+  {
+    path: '/parcel/summary',
+    name: 'parcel-summary',
+    component: () => import('../views/ParcelSummary.vue')
+  },
+  {
+    path: '/parcel/payment',
+    name: 'parcel-payment',
+    component: () => import('../views/ParcelPayment.vue')
   }
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
 
