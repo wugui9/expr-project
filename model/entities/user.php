@@ -10,6 +10,7 @@ class User {
     public string $password;
     public string $salt;
     public string $role;
+    public ?string $address = null;
 }
 
 ?>

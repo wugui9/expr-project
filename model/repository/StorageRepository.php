@@ -3,6 +3,9 @@
 require_once __DIR__ . '/BaseRepository.php';
 require_once __DIR__ . '/../entities/Storage.php';
 
+/**
+ * @extends BaseRepository<Storage>
+ */
 class StorageRepository extends BaseRepository
 {
     public function __construct($connection) 
@@ -15,12 +18,8 @@ class StorageRepository extends BaseRepository
      * @param array $row Database row
      * @return Storage
      */
-    private function mapToEntity($row): Storage
+    protected function mapToEntity(array $row): Storage
     {
-        if (!$row) {
-            return null;
-        }
-
         $storage = new Storage();
         $storage->id = (int)$row['id'];
         $storage->city = $row['city'];
@@ -110,13 +109,7 @@ class StorageRepository extends BaseRepository
             'weight' => $requiredWeight
         ]);
         
-        $rows = $statement->fetchAll();
-        $storages = [];
-        
-        foreach ($rows as $row) {
-            $storages[] = $this->mapToEntity($row);
-        }
-        
-        return $storages;
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        return array_map([$this, 'mapToEntity'], $rows);
     }
 }

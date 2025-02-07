@@ -4,23 +4,21 @@ require_once __DIR__ . '/../php/DBModel.php';
 require_once __DIR__ . '/../entities/Order.php';
 require_once __DIR__ . '/BaseRepository.php';
 
+/**
+ * @extends BaseRepository<Order>
+ */
 class OrderRepository extends BaseRepository {
     public function __construct($connection) 
     {
         parent::__construct($connection, 'order');
     }
 
-
     /**
      * Convert database row to Order entity
      * @param array $row Database row
-     * @return Order|null
+     * @return Order
      */
-    private function mapToEntity($row): ?Order {
-        if (!$row) {
-            return null;
-        }
-
+    protected function mapToEntity(array $row): Order {
         $order = new Order(
             $row['order_number'],
             $row['sender_id'],
@@ -78,23 +76,13 @@ class OrderRepository extends BaseRepository {
     }
 
     /**
-     * Find order by ID
-     * @param mixed $id
-     * @return Order|null
-     */
-    public function findById($id): ?Order {
-        $row = parent::findById($id);
-        return $this->mapToEntity($row);
-    }
-
-    /**
      * Find order by order number
      * @param string $orderNumber
      * @return Order|null
      */
     public function findByOrderNumber(string $orderNumber): ?Order {
-        $rows = $this->findBy(['order_number' => $orderNumber]);
-        return !empty($rows) ? $this->mapToEntity($rows[0]) : null;
+        $results = $this->findBy(['order_number' => $orderNumber]);
+        return !empty($results) ? $results[0] : null;
     }
 
     /**
@@ -103,8 +91,7 @@ class OrderRepository extends BaseRepository {
      * @return Order[]
      */
     public function findBySenderId(int $senderId): array {
-        $rows = $this->findBy(['sender_id' => $senderId]);
-        return array_map([$this, 'mapToEntity'], $rows);
+        return $this->findBy(['sender_id' => $senderId]);
     }
 
     /**
@@ -113,8 +100,7 @@ class OrderRepository extends BaseRepository {
      * @return Order[]
      */
     public function findByDelivererId(int $delivererId): array {
-        $rows = $this->findBy(['deliverer_id' => $delivererId]);
-        return array_map([$this, 'mapToEntity'], $rows);
+        return $this->findBy(['deliverer_id' => $delivererId]);
     }
 
     /**
@@ -135,14 +121,5 @@ class OrderRepository extends BaseRepository {
      */
     public function assignRelayPoint(int $id, ?int $relayPointId): bool {
         return $this->update($id, ['relay_point_id' => $relayPointId]);
-    }
-
-    /**
-     * Get all orders
-     * @return Order[]
-     */
-    public function findAll(): array {
-        $rows = parent::findAll();
-        return array_map([$this, 'mapToEntity'], $rows);
     }
 } 

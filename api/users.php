@@ -3,33 +3,9 @@ require_once __DIR__ . '/../model/php/env_settings.php';
 require_once __DIR__ . '/ApiRouter.php';
 require_once __DIR__ . '/../schemas/user_schema.php';
 require_once __DIR__ . '/../model/repository/UserRepository.php';
+require_once __DIR__ . '/../utils/session.php';
 
 $router = new ApiRouter();
-
-/**
- * Generate JWT token
- * @param array<string,mixed> $payload
- * @param string $secret
- * @return string
- */
-function generateJWT(array $payload, string $secret): string {
-    // Create JWT header
-    $header = [
-        'typ' => 'JWT',
-        'alg' => 'HS256'
-    ];
-
-    // Encode header and payload
-    $base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode($header)));
-    $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode($payload)));
-
-    // Create signature
-    $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $secret, true);
-    $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
-
-    // Create JWT
-    return $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
-}
 
 /**
  * Handle user login request
@@ -69,7 +45,7 @@ function handleLogin(array $data): array
         'role' => $user->role
     ];
 
-    $jwt_secret = getenv('JWT_SECRET') ?: 'your-256-bit-secret';
+    $jwt_secret = getenv('JWT_SECRET') ?: '6AC9AE9E7932287592B39D4772638';
     $token = generateJWT($payload, $jwt_secret);
 
     // Set JWT token in HTTP-only cookie
@@ -87,6 +63,47 @@ function handleLogin(array $data): array
     return $response->toArray();
 }
 
+/**
+ * Get current authenticated user information
+ * @return array<string,mixed> User data
+ * @throws Exception When not authenticated
+ */
+function getCurrentUser(): array
+{
+    try {
+        $userId = getAuthenticatedUserId();
+        
+        $database = new DBModel();
+        $userRepository = new UserRepository($database->get_connection());
+        
+        /** @var User|null $user */
+        $user = $userRepository->findById($userId);
+        if (!$user) {
+            http_response_code(404);
+            return [
+                'error' => 'User not found'
+            ];
+        }
+
+        // Convert User entity to array
+        return [
+            'id' => $user->id,
+            'email' => $user->email,
+            'role' => $user->role,
+            'firstname' => $user->firstname,
+            'lastname' => $user->lastname,
+            'phone' => $user->phone,
+            'address' => $user->address ?? null
+        ];
+    } catch (Exception $e) {
+        http_response_code(401);
+        return [
+            'error' => 'Not authenticated: ' . $e->getMessage()
+        ];
+    }
+}
+
 $router->register('POST', 'users/login', 'handleLogin');
+$router->register('GET', 'users/current', 'getCurrentUser');
 
 $router->handleRequest();

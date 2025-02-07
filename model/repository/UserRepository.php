@@ -3,6 +3,9 @@
 require_once __DIR__ . '/BaseRepository.php';
 require_once __DIR__ . '/../entities/user.php';
 
+/**
+ * @extends BaseRepository<User>
+ */
 class UserRepository extends BaseRepository
 {
     public function __construct($connection) 
@@ -17,16 +20,8 @@ class UserRepository extends BaseRepository
      */
     public function findByEmail(string $email): ?User
     {
-        $sql = "SELECT * FROM user WHERE email = :email";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['email' => $email]);
-        
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$result) {
-            return null;
-        }
-
-        return $this->mapToEntity($result);
+        $result = $this->findBy(['email' => $email]);
+        return !empty($result) ? $result[0] : null;
     }
 
     /**
@@ -46,7 +41,7 @@ class UserRepository extends BaseRepository
      * @param array $row
      * @return User
      */
-    private function mapToEntity(array $row): User
+    protected function mapToEntity(array $row): User
     {
         $user = new User();
         $user->id = (int)$row['id'];
@@ -57,6 +52,7 @@ class UserRepository extends BaseRepository
         $user->password = $row['password'];
         $user->salt = $row['salt'];
         $user->role = $row['role'];
+        $user->address = $row['address'] ?? null;
         
         return $user;
     }
