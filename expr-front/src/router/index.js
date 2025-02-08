@@ -5,6 +5,7 @@ import Storage from '../views/Storage.vue';
 import Parcel from '../views/Parcel.vue';
 import ParcelRecipient from '../views/ParcelRecipient.vue';
 import ParcelPickupPoint from '../views/ParcelPickupPoint.vue';
+import OrderTracking from '@/views/OrderTracking.vue'
 
 const routes = [
   {
@@ -53,7 +54,13 @@ const routes = [
     name: 'parcel-payment',
     component: () => import('../views/ParcelPayment.vue'),
     meta: { requiresAuth: true }
-  }
+  },
+  {
+    path: '/order-tracking',
+    name: 'order-tracking',
+    component: OrderTracking,
+    meta: { requiresAuth: true }
+  },
 ];
 
 const router = createRouter({

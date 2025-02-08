@@ -18,43 +18,23 @@
         <div v-if="selectedPaymentMethod === 'CARD'" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700">Card Number</label>
-            <el-input 
-              v-model="cardForm.number"
-              placeholder="Enter card number"
-              maxlength="16"
-              show-word-limit
-              autocomplete="cc-number"
-            />
+            <el-input v-model="cardForm.number" placeholder="Enter card number" maxlength="16" show-word-limit
+              autocomplete="cc-number" />
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700">Cardholder Name</label>
-            <el-input 
-              v-model="cardForm.name"
-              placeholder="Enter cardholder name"
-              autocomplete="cc-name"
-            />
+            <el-input v-model="cardForm.name" placeholder="Enter cardholder name" autocomplete="cc-name" />
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700">Expiry Date</label>
-              <el-input 
-                v-model="cardForm.expiry"
-                placeholder="MM/YY"
-                maxlength="5"
-                autocomplete="cc-exp"
-              />
+              <el-input v-model="cardForm.expiry" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Security Code</label>
-              <el-input 
-                v-model="cardForm.cvv"
-                placeholder="CVV"
-                maxlength="3"
-                show-password
-                autocomplete="cc-csc"
-              />
+              <el-input v-model="cardForm.cvv" placeholder="CVV" maxlength="3" show-password autocomplete="cc-csc" />
             </div>
           </div>
         </div>
@@ -62,7 +42,12 @@
         <!-- PayPal Section -->
         <div v-else-if="selectedPaymentMethod === 'PAYPAL'" class="text-center p-8">
           <p class="mb-4">You will be redirected to PayPal to complete your payment.</p>
-          <img src="/paypal-logo.png" alt="PayPal" class="mx-auto h-12" />
+          <div class="flex items-center justify-center gap-2 text-2xl text-blue-600">
+            <el-icon class="text-3xl">
+              <Money />
+            </el-icon>
+            <span class="font-bold">PayPal</span>
+          </div>
         </div>
 
         <!-- Total Amount -->
@@ -88,9 +73,13 @@
 <script>
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
+import { Money } from '@element-plus/icons-vue'
 
 export default {
   name: 'ParcelPaymentView',
+  components: {
+    Money
+  },
   data() {
     return {
       orderData: {},
@@ -145,14 +134,19 @@ export default {
         // In a real application, you would process the payment here
         // For now, we'll just submit the order
         const response = await axios.post('/api/order/orders', this.orderData)
-        
+
         ElMessage({
           message: 'Payment successful! Order created.',
           type: 'success'
         })
-        
-        // Redirect to orders list
-        this.$router.push('/orders')
+
+        // Redirect to order tracking page
+        this.$router.push({
+          path: '/order-tracking',
+          query: {
+            orderId: response.data.id
+          }
+        })
       } catch (error) {
         ElMessage({
           message: error.response?.data?.error || 'Payment failed',
@@ -168,4 +162,4 @@ export default {
 .el-select {
   width: 100%;
 }
-</style> 
+</style>

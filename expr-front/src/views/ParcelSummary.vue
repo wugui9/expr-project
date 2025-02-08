@@ -9,37 +9,31 @@
 
           <!-- Weight -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Weight</label>
-            <div class="mt-1 p-2 bg-gray-50 rounded">
-              {{ orderData.weight }} kg
-            </div>
+            <el-form-item label="Weight">
+              <el-input v-model="orderData.weight" disabled />
+            </el-form-item>
           </div>
+
 
           <!-- Delivery Address -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Delivery Address</label>
-            <div class="mt-1 p-2 bg-gray-50 rounded">
-              {{ orderData.shipping_address }}
-            </div>
+            <el-form-item label="Delivery Address">
+              <el-input v-model="orderData.shipping_address" disabled />
+            </el-form-item>
           </div>
 
           <!-- Delivery Cost -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Delivery Cost</label>
-            <div class="mt-1 p-2 bg-gray-50 rounded">
-              {{ deliveryCost }}€
-            </div>
+            <el-form-item label="Delivery Cost">
+              <el-input v-model="delivery_cost" disabled />
+            </el-form-item>
           </div>
 
           <!-- Insurance -->
           <div class="mb-4" v-if="orderData.compensation">
-            <label class="block text-sm font-medium text-gray-700">Insurance</label>
-            <div class="mt-1 p-2 bg-gray-50 rounded">
-              <el-checkbox v-model="hasInsurance" disabled>Insurance</el-checkbox>
-              <div v-if="hasInsurance" class="mt-2">
-                Compensation Amount: {{ orderData.compensation }}€
-              </div>
-            </div>
+            <el-form-item label="Insurance">
+              <el-checkbox v-model="orderData.compensation" disabled />
+            </el-form-item>
           </div>
 
           <!-- Total Cost -->
@@ -81,8 +75,9 @@ export default {
   },
   computed: {
     deliveryCost() {
-      return this.orderData.delivery_level === 'EXPRESS' ? 2 : 0
-    }
+      return this.orderData.delivery_level === 'EXPRESS' ? "2€" : "0€"
+    },
+
   },
   created() {
     try {
@@ -120,4 +115,4 @@ export default {
     }
   }
 }
-</script> 
+</script>

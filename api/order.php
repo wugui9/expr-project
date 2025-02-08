@@ -8,41 +8,6 @@ require_once __DIR__ . '/../utils/session.php';
 $router = new ApiRouter();
 
 /**
- * Verify JWT token and extract user data
- * @param string $token JWT token
- * @return array<string,mixed> Decoded payload
- * @throws Exception When token is invalid
- */
-function verifyJWT(string $token): array {
-    $jwt_secret = getenv('JWT_SECRET') ?: 'your-256-6AC9AE9E7932287592B39D4772638-secret';
-    
-    $tokenParts = explode('.', $token);
-    if (count($tokenParts) != 3) {
-        throw new Exception('Invalid token format');
-    }
-
-    [$base64UrlHeader, $base64UrlPayload, $base64UrlSignature] = $tokenParts;
-
-    // Verify signature
-    $signature = base64_decode(str_replace(['-', '_'], ['+', '/'], $base64UrlSignature));
-    $expectedSignature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $jwt_secret, true);
-    
-    if (!hash_equals($signature, $expectedSignature)) {
-        throw new Exception('Invalid token signature');
-    }
-
-    // Decode payload
-    $payload = json_decode(base64_decode(str_replace(['-', '_'], ['+', '/'], $base64UrlPayload)), true);
-    
-    // Check token expiration
-    if (isset($payload['exp']) && $payload['exp'] < time()) {
-        throw new Exception('Token has expired');
-    }
-
-    return $payload;
-}
-
-/**
  * Handle create order request
  * @param array<string,mixed> $data Order data
  * @return array<string,mixed> Created order data
@@ -114,7 +79,56 @@ function handleCreateOrder(array $data): array {
     ];
 }
 
+/**
+ * Handle get order by ID request
+ * @param int $orderId Order ID
+ * @return array<string,mixed> Order data
+ * @throws Exception When order not found
+ */
+function handleGetOrder(int $orderId): array {
+    // Get authenticated user ID for security check
+    $userId = getAuthenticatedUserId();
+    
+    // Get order from database
+    $database = new DBModel();
+    $orderRepository = new OrderRepository($database->get_connection());
+    $order = $orderRepository->findById($orderId);
+    
+    if (!$order) {
+        throw new Exception("Order not found", 404);
+    }
+    
+    // Security check - only allow access to own orders
+    if ($order->getSenderId() !== $userId) {
+        throw new Exception("Unauthorized access", 403);
+    }
+
+    // Return order data
+    return [
+        'id' => $order->getId(),
+        'order_number' => $order->getOrderNumber(),
+        'order_time' => $order->getOrderTime()->format('Y-m-d H:i:s'),
+        'paid_amount' => $order->getPaidAmount(),
+        'payment_method' => $order->getPaymentMethod(),
+        'shipping_address' => $order->getShippingAddress(),
+        'delivery_address' => $order->getDeliveryAddress(),
+        'recipient_lastname' => $order->getRecipientLastname(),
+        'recipient_firstname' => $order->getRecipientFirstname(),
+        'recipient_phone' => $order->getRecipientPhone(),
+        'weight' => $order->getWeight(),
+        'delivery_level' => $order->getDeliveryLevel(),
+        'relay_point_id' => $order->getRelayPointId()
+    ];
+}
+
 // Register routes
 $router->register('POST', 'order/orders', 'handleCreateOrder');
+$router->register('GET', 'order', function() {
+    $orderId = isset($_GET['id']) ? (int)$_GET['id'] : null;
+    if (!$orderId) {
+        throw new Exception("Order ID is required", 400);
+    }
+    return handleGetOrder($orderId);
+});
 
 $router->handleRequest();
