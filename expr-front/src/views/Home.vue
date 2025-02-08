@@ -1,13 +1,7 @@
 <template>
   <div>
     <!-- User Info Section -->
-    <div class="absolute top-4 right-4 flex items-center gap-4">
-      <span v-if="userInfo" class="text-gray-700">
-        Welcome, {{ userInfo.firstname }} {{ userInfo.lastname }}
-      </span>
-      <el-button type="danger" size="small" @click="handleLogout">Logout</el-button>
-    </div>
-
+    <UserInfo />
     <div class="container mx-auto px-4 py-8">
       <h1 class="text-3xl font-bold text-center mb-12">Our Services</h1>
       
@@ -54,54 +48,22 @@
 
 <script>
 import { Box, Location, Timer } from '@element-plus/icons-vue'
-import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import UserInfo from '@/components/UserInfo.vue'
 
 export default {
   name: 'Home',
   components: {
     Box,
     Location,
-    Timer
+    Timer,
+    UserInfo
   },
   setup() {
     const router = useRouter()
-    const userInfo = ref(null)
-
-    const getCurrentUser = async () => {
-      try {
-        const response = await fetch('/api/users/current')
-        const data = await response.json()
-        
-        if (response.ok) {
-          userInfo.value = data
-        } else {
-          throw new Error(data.error || 'Failed to get user info')
-        }
-      } catch (error) {
-        ElMessage.error(error.message)
-        router.push('/login')
-      }
-    }
-
-    const handleLogout = () => {
-      // Clear the JWT cookie by setting it to expire
-      document.cookie = 'jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
-      router.push('/login')
-      ElMessage.success('Logged out successfully')
-    }
-
-    onMounted(() => {
-      getCurrentUser()
-    })
-
-    return {
-      userInfo,
-      handleLogout
-    }
   },
   methods: {
+
     handleCardClick(type) {
       switch(type) {
         case 'parcel':

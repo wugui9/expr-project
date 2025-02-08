@@ -103,7 +103,30 @@ function getCurrentUser(): array
     }
 }
 
+/**
+ * Handle user logout request
+ * @return array<string,mixed> Success message
+ */
+function handleLogout(): array
+{
+    // Clear JWT token cookie
+    setcookie('jwt_token', '', [
+        'expires' => time() - 3600,
+        'path' => '/',
+        'domain' => '',
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'Strict'
+    ]);
+
+    return [
+        'success' => true,
+        'message' => 'Logged out successfully'
+    ];
+}
+
 $router->register('POST', 'users/login', 'handleLogin');
 $router->register('GET', 'users/current', 'getCurrentUser');
+$router->register('POST', 'users/logout', 'handleLogout');
 
 $router->handleRequest();

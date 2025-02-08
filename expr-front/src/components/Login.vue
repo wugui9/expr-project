@@ -74,7 +74,9 @@ export default {
         }
 
         ElMessage.success('Login successful');
-        router.push('/');
+        // Get redirect path from query parameters or default to home
+        const redirectPath = router.currentRoute.value.query.redirect || '/';
+        router.push(redirectPath);
       } catch (error) {
         ElMessage.error(error.message || 'Login failed');
       } finally {

@@ -1,103 +1,106 @@
 <template>
-  <div class="p-6">
-    <h1 class="text-2xl font-bold mb-6">Delivery Information</h1>
+  <div>
+    <UserInfo />
+    <div class="p-6">
+      <h1 class="text-2xl font-bold mb-6">Delivery Information</h1>
 
-    <div class="max-w-2xl mx-auto">
-      <form id="recipient-form" @submit.prevent>
-        <el-form :model="recipientForm" label-position="top">
-          <h2 class="text-xl font-semibold mb-4">Recipient Information</h2>
-          
-          <!-- Last Name -->
-          <el-form-item label="Last Name" required>
-            <el-input 
-              v-model="recipientForm.lastName" 
-              placeholder="Enter last name"
-              name="shipping-lastname"
-              autocomplete="shipping family-name" 
-            />
-          </el-form-item>
+      <div class="max-w-2xl mx-auto">
+        <form id="recipient-form" @submit.prevent>
+          <el-form :model="recipientForm" label-position="top">
+            <h2 class="text-xl font-semibold mb-4">Recipient Information</h2>
+            
+            <!-- Last Name -->
+            <el-form-item label="Last Name" required>
+              <el-input 
+                v-model="recipientForm.lastName" 
+                placeholder="Enter last name"
+                name="shipping-lastname"
+                autocomplete="shipping family-name" 
+              />
+            </el-form-item>
 
-          <!-- First Name -->
-          <el-form-item label="First Name" required>
-            <el-input 
-              v-model="recipientForm.firstName" 
-              placeholder="Enter first name"
-              name="shipping-firstname"
-              autocomplete="shipping given-name"
-            />
-          </el-form-item>
+            <!-- First Name -->
+            <el-form-item label="First Name" required>
+              <el-input 
+                v-model="recipientForm.firstName" 
+                placeholder="Enter first name"
+                name="shipping-firstname"
+                autocomplete="shipping given-name"
+              />
+            </el-form-item>
 
-          <!-- Phone -->
-          <el-form-item label="Phone Number" required>
-            <el-input 
-              v-model="recipientForm.phone" 
-              placeholder="Enter phone number"
-              name="shipping-phone"
-              autocomplete="shipping tel"
-              type="tel"
-            />
-          </el-form-item>
+            <!-- Phone -->
+            <el-form-item label="Phone Number" required>
+              <el-input 
+                v-model="recipientForm.phone" 
+                placeholder="Enter phone number"
+                name="shipping-phone"
+                autocomplete="shipping tel"
+                type="tel"
+              />
+            </el-form-item>
 
-          <!-- Email -->
-          <el-form-item label="Email" required>
-            <el-input 
-              v-model="recipientForm.email" 
-              placeholder="Enter email address"
-              name="shipping-email"
-              autocomplete="shipping email"
-              type="email"
-            />
-          </el-form-item>
+            <!-- Email -->
+            <el-form-item label="Email" required>
+              <el-input 
+                v-model="recipientForm.email" 
+                placeholder="Enter email address"
+                name="shipping-email"
+                autocomplete="shipping email"
+                type="email"
+              />
+            </el-form-item>
 
-          <!-- Delivery Address -->
-          <el-form-item label="Delivery Address" required>
-            <el-input 
-              v-model="recipientForm.address" 
-              placeholder="Enter delivery address"
-              name="shipping-address"
-              autocomplete="shipping street-address"
-            />
-          </el-form-item>
+            <!-- Delivery Address -->
+            <el-form-item label="Delivery Address" required>
+              <el-input 
+                v-model="recipientForm.address" 
+                placeholder="Enter delivery address"
+                name="shipping-address"
+                autocomplete="shipping street-address"
+              />
+            </el-form-item>
 
-          <!-- Additional Address Information -->
-          <el-form-item label="Additional Address Information">
-            <el-input 
-              v-model="recipientForm.addressComplement" 
-              placeholder="Apartment, suite, floor, etc."
-              name="shipping-address-2"
-              autocomplete="shipping address-line2"
-            />
-          </el-form-item>
+            <!-- Additional Address Information -->
+            <el-form-item label="Additional Address Information">
+              <el-input 
+                v-model="recipientForm.addressComplement" 
+                placeholder="Apartment, suite, floor, etc."
+                name="shipping-address-2"
+                autocomplete="shipping address-line2"
+              />
+            </el-form-item>
 
-          <!-- Language Preference -->
-          <el-form-item label="Preferred Language">
-            <el-select 
-              v-model="recipientForm.language" 
-              class="w-full"
-              name="language"
-              autocomplete="language"
-            >
-              <el-option label="English" value="en" />
-              <el-option label="French" value="fr" />
-            </el-select>
-          </el-form-item>
+            <!-- Language Preference -->
+            <el-form-item label="Preferred Language">
+              <el-select 
+                v-model="recipientForm.language" 
+                class="w-full"
+                name="language"
+                autocomplete="language"
+              >
+                <el-option label="English" value="en" />
+                <el-option label="French" value="fr" />
+              </el-select>
+            </el-form-item>
 
-          <!-- Save to Address Book -->
-          <div class="mt-4">
-            <el-checkbox v-model="recipientForm.saveToAddressBook">
-              Save to my address book
-            </el-checkbox>
-          </div>
+            <!-- Save to Address Book -->
+            <div class="mt-4">
+              <el-checkbox v-model="recipientForm.saveToAddressBook">
+                Save to my address book
+              </el-checkbox>
+            </div>
 
-          <!-- Navigation Buttons -->
-          <div class="flex justify-between mt-8">
-            <el-button @click="goBack">Previous Page</el-button>
-            <el-button type="primary" @click="validateAndProceed">
-              {{ isPickupDelivery ? 'Next Page' : 'Validate My Shipment' }}
-            </el-button>
-          </div>
-        </el-form>
-      </form>
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between mt-8">
+              <el-button @click="goBack">Previous Page</el-button>
+              <el-button type="primary" @click="validateAndProceed">
+                {{ isPickupDelivery ? 'Next Page' : 'Validate My Shipment' }}
+              </el-button>
+            </div>
+          </el-form>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -105,9 +108,13 @@
 <script>
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
+import UserInfo from '@/components/UserInfo.vue'
 
 export default {
   name: 'ParcelRecipientView',
+  components: {
+    UserInfo
+  },
   data() {
     return {
       recipientForm: {
