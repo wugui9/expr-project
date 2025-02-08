@@ -44,38 +44,6 @@ class StorageRepository extends BaseRepository
         return $this->mapToEntity($row);
     }
 
-    /**
-     * Override findAll to return array of Storage entities
-     * @return Storage[]
-     */
-    public function findAll(): array
-    {
-        $rows = parent::findAll();
-        $storages = [];
-        
-        foreach ($rows as $row) {
-            $storages[] = $this->mapToEntity($row);
-        }
-        
-        return $storages;
-    }
-
-    /**
-     * Override findBy to return array of Storage entities
-     * @param array $criteria
-     * @return Storage[]
-     */
-    public function findBy($criteria): array
-    {
-        $rows = parent::findBy($criteria);
-        $storages = [];
-        
-        foreach ($rows as $row) {
-            $storages[] = $this->mapToEntity($row);
-        }
-        
-        return $storages;
-    }
 
     /**
      * Find storages by city
@@ -110,6 +78,6 @@ class StorageRepository extends BaseRepository
         ]);
         
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
-        return array_map([$this, 'mapToEntity'], $rows);
+        return $rows;
     }
 }
