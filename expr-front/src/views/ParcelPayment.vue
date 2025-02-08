@@ -142,10 +142,7 @@ export default {
 
         // Redirect to order tracking page
         this.$router.push({
-          path: '/order-tracking',
-          query: {
-            orderId: response.data.id
-          }
+          path: '/orders'
         })
       } catch (error) {
         ElMessage({
