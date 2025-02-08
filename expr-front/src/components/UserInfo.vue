@@ -1,9 +1,17 @@
 <template>
-  <div class="absolute top-4 right-4 flex items-center gap-4">
-    <span v-if="userInfo" class="text-gray-700">
-      Welcome, {{ userInfo.firstname }} {{ userInfo.lastname }}
-    </span>
-    <el-button type="danger" size="small" @click="handleLogout" :loading="loading">Logout</el-button>
+  <div class="flex justify-between items-center w-full px-4 py-2">
+    <el-button type="primary" size="small" @click="goHome">
+      <el-icon class="mr-1">
+        <HomeFilled />
+      </el-icon>
+      Home
+    </el-button>
+    <div class="flex items-center gap-4">
+      <span v-if="userInfo" class="text-gray-700">
+        Welcome, {{ userInfo.firstname }} {{ userInfo.lastname }}
+      </span>
+      <el-button type="danger" size="small" @click="handleLogout" :loading="loading">Logout</el-button>
+    </div>
   </div>
 </template>
 
@@ -11,9 +19,13 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { HomeFilled } from '@element-plus/icons-vue'
 
 export default {
   name: 'UserInfo',
+  components: {
+    HomeFilled
+  },
   setup() {
     const router = useRouter()
     const userInfo = ref(null)
@@ -23,7 +35,7 @@ export default {
       try {
         const response = await fetch('/api/users/current')
         const data = await response.json()
-        
+
         if (response.ok) {
           userInfo.value = data
         } else {
@@ -46,7 +58,7 @@ export default {
         })
 
         const data = await response.json()
-        
+
         if (response.ok) {
           ElMessage.success(data.message || 'Logged out successfully')
           userInfo.value = null
@@ -62,6 +74,10 @@ export default {
       }
     }
 
+    const goHome = () => {
+      router.push('/')
+    }
+
     onMounted(() => {
       getCurrentUser()
     })
@@ -69,8 +85,9 @@ export default {
     return {
       userInfo,
       loading,
-      handleLogout
+      handleLogout,
+      goHome
     }
   }
 }
-</script> 
+</script>

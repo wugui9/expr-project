@@ -168,7 +168,7 @@ export default {
         const loadGoogleMapsScript = () => {
             if (!window.google) {
                 const script = document.createElement('script')
-                script.src = `https://maps.googleapis.com/maps/api/js?key=`
+                script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCycB2_hnPfrMFfzoWwdpBouu2VDPlrorg`
                 script.async = true
                 script.defer = true
                 script.onload = () => {
