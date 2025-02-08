@@ -1,5 +1,6 @@
 <template>
   <div class="storage-page">
+    <UserInfo />
     <div class="storage-container">
       <h2 class="text-2xl font-bold mb-4">Point relais</h2>
       
@@ -7,19 +8,11 @@
         <div class="flex gap-4 items-center">
           <div class="flex-1">
             <label class="block mb-1">City</label>
-            <el-input
-              v-model="searchCity"
-              placeholder="Enter city name"
-              @input="debouncedSearch"
-            />
+            <el-input v-model="searchCity" placeholder="Enter city name" @input="debouncedSearch" />
           </div>
           <div class="flex-1">
             <label class="block mb-1">Postal Code</label>
-            <el-input
-              v-model="searchPostalCode"
-              placeholder="Enter postal code"
-              @input="debouncedSearch"
-            />
+            <el-input v-model="searchPostalCode" placeholder="Enter postal code" @input="debouncedSearch" />
           </div>
         </div>
       </div>
@@ -40,7 +33,9 @@
       <div class="map-wrapper relative bg-gray-100 rounded-lg overflow-hidden" style="height: 600px;">
         <div id="map" class="absolute inset-0"></div>
         <div v-if="!isMapLoaded" class="absolute inset-0 flex items-center justify-center bg-gray-100/80">
-          <el-icon class="text-4xl animate-spin"><Loading /></el-icon>
+          <el-icon class="text-4xl animate-spin">
+            <Loading />
+          </el-icon>
         </div>
       </div>
     </div>
@@ -51,10 +46,11 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { Loading } from '@element-plus/icons-vue'
-
+import UserInfo from '@/components/UserInfo.vue'
 export default {
   name: 'StorageView',
   components: {
+    UserInfo,
     Loading
   },
   data() {
