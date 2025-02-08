@@ -121,6 +121,40 @@ function handleGetOrder(int $orderId): array {
     ];
 }
 
+/**
+ * Handle get user orders request
+ * @return array<array<string,mixed>> List of order data
+ * @throws Exception When retrieval fails
+ */
+function handleGetUserOrders(): array {
+    // Get authenticated user ID
+    $userId = getAuthenticatedUserId();
+    
+    // Get orders from database
+    $database = new DBModel();
+    $orderRepository = new OrderRepository($database->get_connection());
+    $orders = $orderRepository->findBySenderId($userId);
+    
+    // Transform orders to response format
+    return array_map(function($order) {
+        return [
+            'id' => $order->getId(),
+            'order_number' => $order->getOrderNumber(),
+            'order_time' => $order->getOrderTime()->format('Y-m-d H:i:s'),
+            'paid_amount' => $order->getPaidAmount(),
+            'payment_method' => $order->getPaymentMethod(),
+            'shipping_address' => $order->getShippingAddress(),
+            'delivery_address' => $order->getDeliveryAddress(),
+            'recipient_lastname' => $order->getRecipientLastname(),
+            'recipient_firstname' => $order->getRecipientFirstname(),
+            'recipient_phone' => $order->getRecipientPhone(),
+            'weight' => $order->getWeight(),
+            'delivery_level' => $order->getDeliveryLevel(),
+            'relay_point_id' => $order->getRelayPointId()
+        ];
+    }, $orders);
+}
+
 // Register routes
 $router->register('POST', 'order/orders', 'handleCreateOrder');
 $router->register('GET', 'order', function() {
@@ -130,5 +164,6 @@ $router->register('GET', 'order', function() {
     }
     return handleGetOrder($orderId);
 });
+$router->register('GET', 'order/list', 'handleGetUserOrders');
 
 $router->handleRequest();

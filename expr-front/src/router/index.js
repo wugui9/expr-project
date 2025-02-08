@@ -61,6 +61,11 @@ const routes = [
     component: OrderTracking,
     meta: { requiresAuth: true }
   },
+  {
+    path: '/orders',
+    name: 'orders',
+    component: () => import('../views/Orders.vue')
+  },
 ];
 
 const router = createRouter({
