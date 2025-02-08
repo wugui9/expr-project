@@ -207,6 +207,7 @@ export default {
         script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCseBl7rta84SCHJ2N9Knh6iFKFJIpK1Ns&libraries=places,marker`
         script.async = true
         script.defer = true
+
         script.onload = () => {
           console.log('Google Maps script loaded')
           this.isMapScriptLoaded = true

@@ -3,12 +3,13 @@
         <UserInfo />
         <h1 class="text-2xl font-bold mb-6">Order Tracking</h1>
 
-        <div class="max-w-7xl mx-auto">
-            <div class="flex flex-col lg:flex-row gap-8">
+        <div class="max-w-full mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Left Column - Map -->
-                <div class="lg:w-1/3 bg-white p-6 rounded-lg shadow">
+                <div class="bg-white p-6 rounded-lg shadow h-screen sticky top-0">
                     <h2 class="text-lg font-semibold mb-4">Delivery Location</h2>
-                    <div class="map-container relative bg-gray-100 rounded-lg overflow-hidden" style="height: 600px;">
+                    <div class="map-container relative bg-gray-100 rounded-lg overflow-hidden"
+                        style="height: calc(100vh - 200px);">
                         <div id="map" class="absolute inset-0 w-full h-full"></div>
                         <div v-if="!isMapLoaded"
                             class="absolute inset-0 flex items-center justify-center bg-gray-100/80">
@@ -20,7 +21,7 @@
                 </div>
 
                 <!-- Right Column - Order Details -->
-                <div class="lg:w-2/3 bg-white p-6 rounded-lg shadow">
+                <div class="bg-white p-6 rounded-lg shadow">
                     <!-- Order Details -->
                     <div class="mb-6">
                         <h2 class="text-lg font-semibold mb-2">Order Details</h2>

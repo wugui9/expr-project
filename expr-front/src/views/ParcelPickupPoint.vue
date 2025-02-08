@@ -1,5 +1,6 @@
 <template>
   <div class="p-6">
+    <UserInfo />
     <h1 class="text-2xl font-bold mb-6">Select Pickup Point</h1>
 
     <div class="max-w-6xl mx-auto">
@@ -18,6 +19,7 @@
         <div class="space-y-6">
           <form id="pickup-point-form" @submit.prevent>
             <!-- City Selection -->
+            <div class="flex justify-between mt-50">
             <el-form-item label="City">
               <el-input 
                 v-model="selectedCity" 
@@ -27,6 +29,7 @@
                 autocomplete="shipping address-level2"
               />
             </el-form-item>
+            </div>
 
             <!-- Postal Code -->
             <el-form-item label="Postal Code">
@@ -40,46 +43,44 @@
             </el-form-item>
 
             <!-- Pickup Point Selection -->
-            <div class="space-y-4">
-              <h3 class="text-lg font-semibold">Available Pickup Points</h3>
+            <div class="mt-6">
+              <form @submit.prevent="handleSubmit">
+                <div class="mb-4">
+                  <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Select a Pickup Point
+                  </label>
               <div v-if="loading" class="text-gray-500">
                 Loading pickup points...
               </div>
               <div v-else-if="error" class="text-red-500">
                 {{ error }}
               </div>
-              <div v-else-if="filteredStorages.length === 0" class="text-gray-500">
-                No pickup points found for the current search
-              </div>
-              <el-radio-group 
+                  <el-select
                 v-else
                 v-model="selectedPointId" 
-                class="flex flex-col space-y-4"
+                    class="w-full"
+                    placeholder="Select a pickup point"
+                    @change="selectPoint(filteredStorages.find(p => p.id === selectedPointId))"
               >
-                <el-radio 
+                    <el-option
                   v-for="point in filteredStorages" 
                   :key="point.id" 
+                      :label="`Point ${point.id}: ${point.detailed_address}, ${point.city}, ${point.postal_code}`"
                   :value="point.id"
-                  class="w-full p-4 border rounded-lg"
-                  @change="selectPoint(point)"
-                >
-                  <div class="flex flex-col">
-                    <span class="font-semibold">Point {{ point.id }}</span>
-                    <span class="text-sm text-gray-600">{{ point.detailed_address }}</span>
-                    <span class="text-sm text-gray-600">{{ point.city }}, {{ point.postal_code }}</span>
-                    <span class="text-sm text-gray-600">
-                      Capacity: {{ point.capacity_volume_of_the_warehouse }}m³ / {{ point.capacity_weight_of_the_warehouse }}kg
-                    </span>
+                    />
+                  </el-select>
+                  <div v-if="!loading && !error && filteredStorages.length === 0" class="text-gray-500 mt-2">
+                    No pickup points found for the current search
                   </div>
-                </el-radio>
-              </el-radio-group>
+                </div>
+              </form>
             </div>
           </form>
         </div>
       </div>
 
       <!-- Navigation Buttons -->
-      <div class="flex justify-between mt-8">
+      <div class="flex justify-between mt-50">
         <el-button @click="goBack">Previous Page</el-button>
         <el-button type="primary" @click="proceed" :disabled="!selectedPoint">
           Validate Selection
@@ -224,12 +225,10 @@ export default {
           const infoWindow = new google.maps.InfoWindow({
             content: `
               <div class="p-4 max-w-xs">
-                <h3 class="font-bold text-lg mb-2">Point ${storage.id}</h3>
+                <h3 class="font-bold text-lg mb-2">Point ${storage.id}: </h3>
                 <p class="mb-1"><strong>City:</strong> ${storage.city}</p>
                 <p class="mb-1"><strong>Address:</strong> ${storage.detailed_address}</p>
                 <p class="mb-1"><strong>Postal Code:</strong> ${storage.postal_code}</p>
-                <p class="mb-1"><strong>Volume Capacity:</strong> ${storage.capacity_volume_of_the_warehouse} m³</p>
-                <p class="mb-1"><strong>Weight Capacity:</strong> ${storage.capacity_weight_of_the_warehouse} kg</p>
               </div>
             `
           })
