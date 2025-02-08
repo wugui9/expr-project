@@ -6,6 +6,8 @@
   padding: 1rem;
   font-weight: normal;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 a,
@@ -24,15 +26,8 @@ a,
 }
 
 @media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
   #app {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(800px, 1fr));
-    gap: 2rem;
+    width: 100%;
     padding: 1rem 2rem;
   }
 }
